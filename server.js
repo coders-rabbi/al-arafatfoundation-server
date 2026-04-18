@@ -27,6 +27,10 @@ async function run() {
 
         const allBlogs = client.db("al-arafat-foundation").collection("blogs");
 
+        app.get('/', (req, res) => {
+            res.send('Hello Al Afarat Foundation!')
+        })
+
 
         app.get("/blogs", async (req, res) => {
             const result = await allBlogs.find().toArray();
