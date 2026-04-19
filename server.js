@@ -31,7 +31,7 @@ async function connectDB() {
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('Hello Al Afarat Foundation!');
+    res.send('Hello Al Arafat Foundation!');
 });
 
 app.get("/blogs", async (req, res) => {
