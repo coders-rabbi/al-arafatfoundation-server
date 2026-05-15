@@ -1,11 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
 
 const app = express();
 
-// MIDDLEWARE
+// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -24,33 +24,54 @@ let db;
 async function connectDB() {
     if (!db) {
         await client.connect();
+        await client.db("admin").command({ ping: 1 });
+        console.log("Connected to MongoDB!");
+
         db = client.db("al-arafat-foundation");
     }
     return db;
 }
 
 // Routes
-app.get('/', (req, res) => {
-    res.send('Hello Al Arafat Foundation!');
+app.get("/", (req, res) => {
+    res.send("Hello Al Arafat Foundation!");
 });
 
+// Blogs Route
 app.get("/blogs", async (req, res) => {
     try {
         const database = await connectDB();
-        const allBlogs = database.collection("blogs");
-        const result = await allBlogs.find().toArray();
+        const blogsCollection = database.collection("blogs");
+
+        const result = await blogsCollection.find().toArray();
+
         res.send(result);
     } catch (error) {
         res.status(500).send({ message: "Internal Server Error" });
     }
 });
 
-// Vercel-এর জন্য এটি সবচেয়ে গুরুত্বপূর্ণ
+// Products Route
+app.get("/products", async (req, res) => {
+    try {
+        const database = await connectDB();
+        const productsCollection = database.collection("products");
+
+        const result = await productsCollection.find().toArray();
+
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: "Internal Server Error" });
+    }
+});
+
+// Export for Vercel
 module.exports = app;
 
-// লোকালি চালানোর জন্য
-if (process.env.NODE_ENV !== 'production') {
+// Local Server
+if (process.env.NODE_ENV !== "production") {
     const port = process.env.PORT || 5000;
+
     app.listen(port, () => {
         console.log(`Server running on port ${port}`);
     });
