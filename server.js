@@ -65,6 +65,31 @@ app.get("/products", async (req, res) => {
     }
 });
 
+app.get("/products/:id", async (req, res) => {
+    try {
+        const productID = req.params.id;
+
+        const database = await connectDB();
+        const productsCollection = database.collection("products");
+
+        const result = await productsCollection.findOne({
+            id: Number(productID),
+        });
+
+        if (!result) {
+            return res.status(404).send({
+                message: "Product not found",
+            });
+        }
+
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+});
+
 // Export for Vercel
 module.exports = app;
 
