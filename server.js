@@ -90,6 +90,29 @@ app.get("/products/:id", async (req, res) => {
     }
 });
 
+
+app.post("/orders", async (req, res) => {
+    try {
+        const database = await connectDB();
+        const orderCollection = database.collection("order");
+        const orderData = req.body;
+
+        if (!orderData || Object.keys(orderData).length === 0) {
+            return res.status(400).send({ message: "Order data is required" });
+        }
+
+        const result = await orderCollection.insertOne(orderData);
+        res.status(201).send({
+            message: "Order created successfully",
+            insertedId: result.insertedId,
+            order: orderData
+        });
+    } catch (error) {
+        res.status(500).send({ message: "Internal Server Error" });
+    }
+})
+
+
 // Export for Vercel
 module.exports = app;
 
