@@ -112,6 +112,18 @@ app.post("/orders", async (req, res) => {
     }
 })
 
+app.get("/orders_data", async (req, res) => {
+    try {
+        const database = await connectDB();
+        const orderCollection = database.collection("order");
+        const result = await orderCollection.find().toArray();
+
+        res.send(result);
+    } catch (error) {
+        res.status(500).send({ message: "Internal Server Error" });
+    }
+})
+
 
 // Export for Vercel
 module.exports = app;
