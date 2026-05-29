@@ -216,6 +216,83 @@ app.get("/orders_data", async (req, res) => {
 });
 
 
+// Update Order Status
+// Update Order Status
+app.patch("/orders/:id/status", async (req, res) => {
+    try {
+        const orderID = req.params.id;
+
+        const { orderStatus } = req.body;
+
+        // Validate ObjectId
+        if (!ObjectId.isValid(orderID)) {
+            return res.status(400).send({
+                success: false,
+                message: "Invalid Order ID",
+            });
+        }
+
+        // Validate Status
+        const validStatuses = [
+            "Pending",
+            "Processing",
+            "Shipped",
+            "Out for Delivery",
+            "Delivered",
+            "Cancelled",
+        ];
+
+        if (!validStatuses.includes(orderStatus)) {
+            return res.status(400).send({
+                success: false,
+                message: "Invalid order status",
+            });
+        }
+
+        const database = await connectDB();
+
+        const orderCollection = database.collection("order");
+
+        // Update order
+        const result = await orderCollection.updateOne(
+            {
+                _id: new ObjectId(orderID),
+            },
+            {
+                $set: {
+                    orderStatus,
+                    updatedAt: new Date(),
+                },
+            }
+        );
+
+        // যদি order না পাওয়া যায়
+        if (result.matchedCount === 0) {
+            return res.status(404).send({
+                success: false,
+                message: "Order not found",
+            });
+        }
+
+        res.send({
+            success: true,
+            message: "Order status updated successfully",
+            modifiedCount: result.modifiedCount,
+        });
+
+    } catch (error) {
+
+        console.log("Update Order Error:", error);
+
+        res.status(500).send({
+            success: false,
+            message: "Internal Server Error",
+            error: error.message,
+        });
+    }
+});
+
+
 // Export for Vercel
 module.exports = app;
 
