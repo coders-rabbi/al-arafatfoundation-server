@@ -290,29 +290,86 @@ app.patch("/orders/:id/status", async (req, res) => {
         });
     }
 });
+
+
+
+function getFAQResponse(message) {
+    const text = message.toLowerCase();
+
+    // Order
+    if (
+        text.includes("order") ||
+        text.includes("অর্ডার") ||
+        text.includes("কিভাবে অর্ডার")
+    ) {
+        return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
+
+https://flame-bd.com
+
+পছন্দের টি-শার্ট নির্বাচন করে Checkout সম্পন্ন করুন।`;
+    }
+
+    // Size
+    if (
+        text.includes("size") ||
+        text.includes("সাইজ") ||
+        text.includes("size chart")
+    ) {
+        return `📏 আপনার উচ্চতা ও ওজন জানালে আমরা সঠিক সাইজ সাজেস্ট করতে পারি।`;
+    }
+
+    // Delivery
+    if (
+        text.includes("delivery") ||
+        text.includes("ডেলিভারি") ||
+        text.includes("shipping")
+    ) {
+        return `🚚 আমরা সারা বাংলাদেশে ডেলিভারি করে থাকি।`;
+    }
+
+    // Payment
+    if (
+        text.includes("payment") ||
+        text.includes("cod") ||
+        text.includes("cash on delivery")
+    ) {
+        return `💵 Cash on Delivery Available।`;
+    }
+
+    // Exchange
+    if (
+        text.includes("exchange") ||
+        text.includes("return")
+    ) {
+        return `🔄 পণ্যে কোনো সমস্যা থাকলে আমাদের সাথে যোগাযোগ করুন।`;
+    }
+
+    return null;
+}
+
 app.post("/webhook", async (req, res) => {
     try {
-        console.log(
-            "TOKEN EXISTS:",
-            !!process.env.PAGE_ACCESS_TOKEN
-        );
-
-        console.log(
-            "TOKEN LENGTH:",
-            process.env.PAGE_ACCESS_TOKEN?.length
-        );
-
         const body = req.body;
 
         if (body.object === "page") {
             for (const entry of body.entry) {
                 for (const webhookEvent of entry.messaging) {
+
                     const senderId = webhookEvent.sender.id;
 
                     if (webhookEvent.message?.text) {
+
                         const userMessage = webhookEvent.message.text;
 
                         console.log("User Message:", userMessage);
+
+                        const faqResponse = getFAQResponse(userMessage);
+
+                        const replyText =
+                            faqResponse ||
+                            `👋 Flame Street Wear এ স্বাগতম!
+
+আপনার প্রশ্নের উত্তর দেওয়ার জন্য আমাদের টিম শীঘ্রই যোগাযোগ করবে।`;
 
                         await axios.post(
                             `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
@@ -321,7 +378,7 @@ app.post("/webhook", async (req, res) => {
                                     id: senderId,
                                 },
                                 message: {
-                                    text: "👋 Welcome to Flame Street Wear! শিমুলের লবন ছাড়া ডাউল 😂",
+                                    text: replyText,
                                 },
                             }
                         );
@@ -335,7 +392,9 @@ app.post("/webhook", async (req, res) => {
         }
 
         return res.sendStatus(404);
+
     } catch (error) {
+
         console.error(
             "Messenger Reply Error:",
             error.response?.data || error.message
