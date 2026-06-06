@@ -321,7 +321,7 @@ app.post("/webhook", async (req, res) => {
                                     id: senderId,
                                 },
                                 message: {
-                                    text: "👋 Welcome to Flame Street Wear!",
+                                    text: "👋 Welcome to Flame Street Wear! শিমুলের লবন ছাড়া ডাউল 😂",
                                 },
                             }
                         );
