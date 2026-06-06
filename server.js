@@ -290,9 +290,6 @@ app.patch("/orders/:id/status", async (req, res) => {
         });
     }
 });
-
-const axios = require("axios");
-
 app.post("/webhook", async (req, res) => {
     try {
         console.log(
