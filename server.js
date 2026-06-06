@@ -1,3 +1,4 @@
+const axios = require("axios");
 const express = require("express");
 const cors = require("cors");
 const {
@@ -290,13 +291,49 @@ app.patch("/orders/:id/status", async (req, res) => {
     }
 });
 
-app.post("/webhook", (req, res) => {
-    console.log(
-        "Webhook Event:",
-        JSON.stringify(req.body, null, 2)
-    );
+app.post("/webhook", async (req, res) => {
+    try {
+        const body = req.body;
 
-    res.sendStatus(200);
+        if (body.object === "page") {
+            for (const entry of body.entry) {
+                const webhookEvent = entry.messaging[0];
+
+                const senderId = webhookEvent.sender.id;
+
+                if (webhookEvent.message?.text) {
+                    const userMessage = webhookEvent.message.text;
+
+                    console.log("User Message:", userMessage);
+
+                    await axios.post(
+                        `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+                        {
+                            recipient: {
+                                id: senderId,
+                            },
+                            message: {
+                                text: `👋 Welcome to Flame Street Wear!
+                                🛒 Order Now:
+                                https://flame-bd.com`,
+                            },
+                        }
+                    );
+                }
+            }
+
+            return res.sendStatus(200);
+        }
+
+        return res.sendStatus(404);
+    } catch (error) {
+        console.error(
+            "Messenger Reply Error:",
+            error.response?.data || error.message
+        );
+
+        return res.sendStatus(500);
+    }
 });
 
 app.get("/webhook", (req, res) => {
