@@ -10,6 +10,11 @@ const {
 require("dotenv").config();
 
 const app = express();
+const OpenAI = require("openai");
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Middleware
 app.use(cors());
@@ -317,7 +322,12 @@ https://flame-bd.com
     if (
         text.includes("size") ||
         text.includes("সাইজ") ||
-        text.includes("size chart")
+        text.includes("size chart") ||
+        text.includes("মাপ") ||
+        text.includes("লার্জ") ||
+        text.includes("medium") ||
+        text.includes("small") ||
+        text.includes("xl")
     ) {
         return `📏 আপনার উচ্চতা ও ওজন জানালে আমরা সঠিক সাইজ সাজেস্ট করতে পারি।`;
     }
@@ -350,6 +360,48 @@ https://flame-bd.com
 
     return null;
 }
+async function getAIResponse(userMessage) {
+    try {
+        const response = await openai.chat.completions.create({
+            model: "gpt-4.1-mini",
+            messages: [
+                {
+                    role: "system",
+                    content: `
+You are the customer support assistant of Flame Street Wear.
+
+Rules:
+- Always reply in Bangla.
+- Keep answers short and helpful.
+- Flame Street Wear sells premium streetwear and drop shoulder t-shirts.
+- If someone wants to order, direct them to https://flame-bd.com
+- If someone asks about size, ask for height and weight.
+- If you don't know something, say you are not sure and ask them to contact support.
+- Never make up policies.
+- Be friendly and professional.
+`,
+                },
+                {
+                    role: "user",
+                    content: userMessage,
+                },
+            ],
+            max_tokens: 150,
+        });
+
+        return (
+            response.choices?.[0]?.message?.content ||
+            "দুঃখিত, আমি এই মুহূর্তে উত্তর দিতে পারছি না।"
+        );
+    } catch (error) {
+        console.error(
+            "OpenAI Error:",
+            error.response?.data || error.message
+        );
+
+        return "দুঃখিত, এই মুহূর্তে AI সহকারী সাময়িকভাবে উপলব্ধ নয়।";
+    }
+}
 
 app.post("/webhook", async (req, res) => {
     try {
@@ -358,22 +410,24 @@ app.post("/webhook", async (req, res) => {
         if (body.object === "page") {
             for (const entry of body.entry) {
                 for (const webhookEvent of entry.messaging) {
-
                     const senderId = webhookEvent.sender.id;
 
                     if (webhookEvent.message?.text) {
-
                         const userMessage = webhookEvent.message.text;
 
                         console.log("User Message:", userMessage);
 
                         const faqResponse = getFAQResponse(userMessage);
 
-                        const replyText =
-                            faqResponse ||
-                            `👋 Flame Street Wear এ স্বাগতম!
+                        let replyText;
 
-আপনার প্রশ্নের উত্তর দেওয়ার জন্য আমাদের টিম শীঘ্রই যোগাযোগ করবে।`;
+                        if (faqResponse) {
+                            replyText = faqResponse;
+                            console.log("FAQ Match Found");
+                        } else {
+                            console.log("Using OpenAI...");
+                            replyText = await getAIResponse(userMessage);
+                        }
 
                         await axios.post(
                             `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
@@ -396,9 +450,7 @@ app.post("/webhook", async (req, res) => {
         }
 
         return res.sendStatus(404);
-
     } catch (error) {
-
         console.error(
             "Messenger Reply Error:",
             error.response?.data || error.message
@@ -407,7 +459,6 @@ app.post("/webhook", async (req, res) => {
         return res.sendStatus(500);
     }
 });
-
 app.get("/webhook", (req, res) => {
     const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
