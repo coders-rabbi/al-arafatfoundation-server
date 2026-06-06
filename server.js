@@ -291,34 +291,46 @@ app.patch("/orders/:id/status", async (req, res) => {
     }
 });
 
+const axios = require("axios");
+
 app.post("/webhook", async (req, res) => {
     try {
+        console.log(
+            "TOKEN EXISTS:",
+            !!process.env.PAGE_ACCESS_TOKEN
+        );
+
+        console.log(
+            "TOKEN LENGTH:",
+            process.env.PAGE_ACCESS_TOKEN?.length
+        );
+
         const body = req.body;
 
         if (body.object === "page") {
             for (const entry of body.entry) {
-                const webhookEvent = entry.messaging[0];
+                for (const webhookEvent of entry.messaging) {
+                    const senderId = webhookEvent.sender.id;
 
-                const senderId = webhookEvent.sender.id;
+                    if (webhookEvent.message?.text) {
+                        const userMessage = webhookEvent.message.text;
 
-                if (webhookEvent.message?.text) {
-                    const userMessage = webhookEvent.message.text;
+                        console.log("User Message:", userMessage);
 
-                    console.log("User Message:", userMessage);
+                        await axios.post(
+                            `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+                            {
+                                recipient: {
+                                    id: senderId,
+                                },
+                                message: {
+                                    text: "👋 Welcome to Flame Street Wear!",
+                                },
+                            }
+                        );
 
-                    await axios.post(
-                        `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-                        {
-                            recipient: {
-                                id: senderId,
-                            },
-                            message: {
-                                text: `👋 Welcome to Flame Street Wear!
-                                🛒 Order Now:
-                                https://flame-bd.com`,
-                            },
-                        }
-                    );
+                        console.log("Reply Sent Successfully");
+                    }
                 }
             }
 
