@@ -290,6 +290,15 @@ app.patch("/orders/:id/status", async (req, res) => {
     }
 });
 
+app.post("/webhook", (req, res) => {
+    console.log(
+        "Webhook Event:",
+        JSON.stringify(req.body, null, 2)
+    );
+
+    res.sendStatus(200);
+});
+
 app.get("/webhook", (req, res) => {
     const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
