@@ -300,9 +300,13 @@ function getFAQResponse(message) {
     if (
         text.includes("order") ||
         text.includes("অর্ডার") ||
-        text.includes("কিভাবে অর্ডার")
+        text.includes("কিভাবে অর্ডার") ||
+        text.includes("order kivabe korbo") ||
+        text.includes("order korte chai") ||
+        text.includes("order kivabe korbo") ||
+        text.includes("order korte ki ki lagbe")
     ) {
-        return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
+        return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
 
 https://flame-bd.com
 
