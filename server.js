@@ -621,6 +621,32 @@ app.post("/webhook", async (req, res) => {
                         const orderIdRegex = /^[a-f0-9]{24}$/i;
                         const phoneRegex = /^(\+8801|01)[3-9]\d{8}$/;
 
+                        if (phoneRegex.test(userMessage)) {
+                            const trackingResponse =
+                                await getOrderTrackingByPhone(userMessage);
+
+                            if (trackingResponse) {
+
+                                await axios.post(
+                                    `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+                                    {
+                                        recipient: {
+                                            id: senderId,
+                                        },
+                                        message: {
+                                            text: trackingResponse,
+                                        },
+                                    }
+                                );
+
+                                console.log("Phone Tracking Sent");
+
+                                continue;
+                            }
+
+                        }
+
+
                         if (orderIdRegex.test(userMessage)) {
 
                             const trackingResponse =
