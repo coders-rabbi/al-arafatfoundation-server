@@ -350,7 +350,7 @@ function getFAQResponse(message) {
         text.includes("অর্ডার ট্র্যাক") ||
         text.includes("অর্ডার স্ট্যাটাস")
     ) {
-        return "📦 আপনার Order ID পাঠান।";
+        return "📦 আপনার Order ID অথবা ফোন নম্বর পাঠান।";
     }
 
     // Order
