@@ -681,133 +681,109 @@ app.post("/webhook", async (req, res) => {
     try {
         const body = req.body;
 
-        if (body.object === "page") {
-            for (const entry of body.entry) {
-                for (const webhookEvent of entry.messaging) {
-                    const senderId = webhookEvent.sender.id;
+        if (body.object !== "page") {
+            return res.sendStatus(404);
+        }
 
-                    if (webhookEvent.message?.text) {
-                        const userMessage =
-                            webhookEvent.message.text.trim();
+        for (const entry of body.entry || []) {
+            for (const webhookEvent of entry.messaging || []) {
+                const senderId = webhookEvent.sender?.id;
 
-                        const orderIdRegex = /^[a-f0-9]{24}$/i;
-                        const phoneRegex = /^(\+8801|01)[3-9]\d{8}$/;
+                if (!senderId || !webhookEvent.message?.text) continue;
 
-                        if (phoneRegex.test(userMessage)) {
-                            const trackingResponse =
-                                await getOrderTrackingByPhone(userMessage);
+                const userMessage = webhookEvent.message.text.trim();
 
-                            if (trackingResponse) {
+                const orderIdRegex = /^[a-f0-9]{24}$/i;
+                const phoneRegex = /^(\+8801|01)[3-9]\d{8}$/;
 
-                                await axios.post(
-                                    `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-                                    {
-                                        recipient: {
-                                            id: senderId,
-                                        },
-                                        message: {
-                                            text: trackingResponse,
-                                        },
-                                    }
-                                );
+                let replyText = null;
 
-                                console.log("Phone Tracking Sent");
+                // =========================
+                // 1. PHONE TRACKING
+                // =========================
+                if (phoneRegex.test(userMessage)) {
+                    const trackingResponse = await getOrderTrackingByPhone(userMessage);
 
-                                continue;
+                    if (trackingResponse) {
+                        await axios.post(
+                            `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+                            {
+                                recipient: { id: senderId },
+                                message: { text: trackingResponse },
                             }
+                        );
 
-                        }
-
-
-                        if (orderIdRegex.test(userMessage)) {
-
-                            const trackingResponse =
-                                await getOrderTracking(userMessage);
-
-                            if (trackingResponse) {
-
-                                await axios.post(
-                                    `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-                                    {
-                                        recipient: {
-                                            id: senderId,
-                                        },
-                                        message: {
-                                            text: trackingResponse,
-                                        },
-                                    }
-                                );
-
-                                console.log("Order Status Sent");
-
-                                continue;
-                            }
-                        }
-                        const faqResponse =
-                            getFAQResponse(userMessage);
-
-                        let replyText;
-
-                        if (faqResponse) {
-
-                            replyText = faqResponse;
-
-                        } else {
-
-                            const sizeReply =
-                                getSizeRecommendation(userMessage);
-
-                            if (sizeReply) {
-
-                                replyText = sizeReply;
-
-                            } else {
-
-                                const productReply =
-                                    await getProductRecommendation(userMessage);
-
-                                if (productReply) {
-
-                                    console.log(
-                                        "Product Recommendation Found"
-                                    );
-
-                                    replyText = productReply;
-
-                                } else {
-
-                                    console.log("Using OpenAI");
-
-                                    replyText =
-                                        await getAIResponse(userMessage);
-                                }
-                            }
-                        }
-
-                        if (productReply) {
-
-                            console.log("Product Recommendation Found");
-
-                            replyText = productReply;
-
-                        } else {
-
-                            console.log("Using OpenAI");
-
-                            replyText =
-                                await getAIResponse(userMessage);
-                        }
+                        console.log("Phone Tracking Sent");
+                        continue; // skip rest
                     }
+                }
 
+                // =========================
+                // 2. ORDER ID TRACKING
+                // =========================
+                if (orderIdRegex.test(userMessage)) {
+                    const trackingResponse = await getOrderTracking(userMessage);
+
+                    if (trackingResponse) {
+                        await axios.post(
+                            `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+                            {
+                                recipient: { id: senderId },
+                                message: { text: trackingResponse },
+                            }
+                        );
+
+                        console.log("Order Status Sent");
+                        continue; // skip rest
+                    }
+                }
+
+                // =========================
+                // 3. FAQ CHECK
+                // =========================
+                const faqResponse = getFAQResponse(userMessage);
+                if (faqResponse) {
+                    replyText = faqResponse;
+                }
+
+                // =========================
+                // 4. SIZE RECOMMENDATION
+                // =========================
+                if (!replyText) {
+                    const sizeReply = getSizeRecommendation(userMessage);
+                    if (sizeReply) {
+                        replyText = sizeReply;
+                    }
+                }
+
+                // =========================
+                // 5. PRODUCT RECOMMENDATION
+                // =========================
+                if (!replyText) {
+                    const productReply = await getProductRecommendation(userMessage);
+                    if (productReply) {
+                        console.log("Product Recommendation Found");
+                        replyText = productReply;
+                    }
+                }
+
+                // =========================
+                // 6. AI FALLBACK
+                // =========================
+                if (!replyText) {
+                    console.log("Using OpenAI");
+                    replyText = await getAIResponse(userMessage);
+                }
+
+                // =========================
+                // SEND RESPONSE
+                // =========================
+                if (replyText) {
                     await axios.post(
                         `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
                         {
-                            recipient: {
-                                id: senderId,
-                            },
-                            message: {
-                                text: replyText,
-                            },
+                            recipient: { id: senderId },
+                            message: { text: replyText },
                         }
                     );
 
@@ -817,17 +793,16 @@ app.post("/webhook", async (req, res) => {
         }
 
         return res.sendStatus(200);
-
-        return res.sendStatus(404);
     } catch (error) {
-    console.error(
-        "Messenger Reply Error:",
-        error.response?.data || error.message
-    );
+        console.error(
+            "Messenger Reply Error:",
+            error.response?.data || error.message
+        );
 
-    return res.sendStatus(500);
-}
+        return res.sendStatus(500);
+    }
 });
+
 app.get("/webhook", (req, res) => {
     const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
