@@ -298,27 +298,22 @@ app.patch("/orders/:id/status", async (req, res) => {
 });
 
 
-
 function getFAQResponse(message) {
-    const text = message.toLowerCase();
+    const text = (message || "").toLowerCase();
 
-    // Order
+    // Order Tracking
     if (
-        text.includes("order") ||
-        text.includes("অর্ডার") ||
-        text.includes("কিভাবে অর্ডার") ||
-        text.includes("order kivabe korbo") ||
-        text.includes("order korte chai") ||
-        text.includes("order kivabe korbo") ||
-        text.includes("order korte ki ki lagbe")
+        text.includes("track") ||
+        text.includes("tracking") ||
+        text.includes("order status") ||
+        text.includes("status") ||
+        text.includes("অর্ডার ট্র্যাক") ||
+        text.includes("অর্ডার স্ট্যাটাস")
     ) {
-        return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
-
-https://flame-bd.com
-
-পছন্দের টি-শার্ট নির্বাচন করে Checkout সম্পন্ন করুন।`;
+        return "📦 আপনার Order ID পাঠান।";
     }
 
+    // Order
     if (
         (
             text.includes("order") ||
@@ -327,24 +322,20 @@ https://flame-bd.com
             text.includes("order kivabe korbo") ||
             text.includes("order korte chai") ||
             text.includes("order korte ki ki lagbe")
-        )
-        &&
-        !text.includes("track")
-        &&
-        !text.includes("tracking")
-        &&
-        !text.includes("status")
-        &&
-        !text.includes("অর্ডার ট্র্যাক")
-        &&
+        ) &&
+        !text.includes("track") &&
+        !text.includes("tracking") &&
+        !text.includes("status") &&
+        !text.includes("অর্ডার ট্র্যাক") &&
         !text.includes("অর্ডার স্ট্যাটাস")
     ) {
-        return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
+        return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
 
 https://flame-bd.com
 
 পছন্দের টি-শার্ট নির্বাচন করে Checkout সম্পন্ন করুন।`;
     }
+
     // Size
     if (
         text.includes("size") ||
@@ -356,7 +347,7 @@ https://flame-bd.com
         text.includes("small") ||
         text.includes("xl")
     ) {
-        return `📏 আপনার উচ্চতা ও ওজন জানালে আমরা সঠিক সাইজ সাজেস্ট করতে পারি।`;
+        return "📏 আপনার উচ্চতা ও ওজন জানালে আমরা সঠিক সাইজ সাজেস্ট করতে পারি।";
     }
 
     // Delivery
@@ -365,7 +356,7 @@ https://flame-bd.com
         text.includes("ডেলিভারি") ||
         text.includes("shipping")
     ) {
-        return `🚚 আমরা সারা বাংলাদেশে ডেলিভারি করে থাকি।`;
+        return "🚚 আমরা সারা বাংলাদেশে ডেলিভারি করে থাকি।";
     }
 
     // Payment
@@ -374,7 +365,7 @@ https://flame-bd.com
         text.includes("cod") ||
         text.includes("cash on delivery")
     ) {
-        return `💵 Cash on Delivery Available।`;
+        return "💵 Cash on Delivery Available।";
     }
 
     // Human Support
@@ -389,21 +380,22 @@ https://flame-bd.com
         text.includes("হেল্প") ||
         text.includes("সাপোর্ট")
     ) {
-        return `📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।
-
-আপনার প্রয়োজন বিস্তারিত লিখে পাঠান। আমরা যত দ্রুত সম্ভব সাহায্য করবো। ❤️`;
+        return (
+            "📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।\n" +
+            "আপনার প্রয়োজন বিস্তারিত লিখে পাঠান। আমরা যত দ্রুত সম্ভব সাহায্য করবো। ❤️"
+        );
     }
 
-    // Exchange
-    if (
-        text.includes("exchange") ||
-        text.includes("return")
-    ) {
-        return `🔄 পণ্যে কোনো সমস্যা থাকলে আমাদের সাথে যোগাযোগ করুন।`;
+    // Exchange / Return
+    if (text.includes("exchange") || text.includes("return")) {
+        return "🔄 পণ্যে কোনো সমস্যা থাকলে আমাদের সাথে যোগাযোগ করুন।";
     }
 
     return null;
+
 }
+
+
 async function getAIResponse(userMessage) {
     try {
         const response = await openai.chat.completions.create({
