@@ -431,54 +431,51 @@ async function getProductRecommendation(userMessage) {
 
         const text = userMessage.toLowerCase();
 
-        let searchText = text;
-
-        // Bangla → English Color Mapping
+        // Exact Color Detection
+        let matchedColor = null;
 
         if (
+            text.includes("black") ||
             text.includes("কালো") ||
             text.includes("kalo")
         ) {
-            searchText = "black";
+            matchedColor = "black";
         }
 
-        if (
+        else if (
+            text.includes("white") ||
             text.includes("সাদা") ||
             text.includes("shada")
         ) {
-            searchText = "white";
+            matchedColor = "white";
         }
 
-        if (
+        else if (
+            text.includes("green") ||
             text.includes("সবুজ") ||
-            text.includes("green")
+            text.includes("bottle green")
         ) {
-            searchText = "bottle green";
+            matchedColor = "bottle green";
         }
 
-        if (
-            text.includes("মেরুন") ||
-            text.includes("maroon")
+        else if (
+            text.includes("maroon") ||
+            text.includes("মেরুন")
         ) {
-            searchText = "maroon";
+            matchedColor = "maroon";
+        }
+
+        // Supported color mention না থাকলে
+        if (!matchedColor) {
+            return null;
         }
 
         const matchedProducts = products.filter((product) => {
 
-            const name =
-                product.basicInfo.productName.toLowerCase();
-
             const color =
                 product.variation.color.toLowerCase();
 
-            const tags =
-                product.organization.searchTags.join(" ").toLowerCase();
-
-            return (
-                name.includes(searchText) ||
-                color.includes(searchText) ||
-                tags.includes(searchText)
-            );
+            return color === matchedColor;
         });
 
         if (matchedProducts.length === 0) {
@@ -487,12 +484,15 @@ async function getProductRecommendation(userMessage) {
 
         const topProducts = matchedProducts.slice(0, 3);
 
-        let reply = "🔥 আমাদের কিছু পছন্দের প্রোডাক্ট:\n\n";
+        let reply =
+            "🔥 আমাদের কিছু পছন্দের প্রোডাক্ট:\n\n";
 
         topProducts.forEach((product) => {
+
             reply += `🛒 ${product.basicInfo.productName}\n`;
             reply += `💰 Price: ${product.pricingInventory.discountPrice}\n`;
             reply += `🎨 Color: ${product.variation.color}\n\n`;
+
         });
 
         reply += "🌐 Order: https://flame-bd.com";
@@ -509,7 +509,6 @@ async function getProductRecommendation(userMessage) {
         return null;
     }
 }
-
 
 app.post("/webhook", async (req, res) => {
     try {
