@@ -319,6 +319,17 @@ https://flame-bd.com
 পছন্দের টি-শার্ট নির্বাচন করে Checkout সম্পন্ন করুন।`;
     }
 
+    if (
+        text.includes("track") ||
+        text.includes("tracking") ||
+        text.includes("order status") ||
+        text.includes("status") ||
+        text.includes("অর্ডার ট্র্যাক") ||
+        text.includes("অর্ডার স্ট্যাটাস")
+    ) {
+        return "📦 আপনার Order ID পাঠান।";
+    }
+
     // Size
     if (
         text.includes("size") ||
@@ -522,6 +533,23 @@ async function getProductRecommendation(userMessage) {
     }
 }
 
+async function getOrderTracking(orderId) {
+    try {
+
+        const response = await axios.get(
+            `https://al-arafatfoundation-server-production.up.railway.app/orders/${orderId}`
+        );
+
+        const order = response.data;
+
+        return `📦 Order Status: ${order.orderStatus}`;
+
+    } catch (error) {
+
+        return null;
+    }
+}
+
 app.post("/webhook", async (req, res) => {
     try {
         const body = req.body;
@@ -533,6 +561,33 @@ app.post("/webhook", async (req, res) => {
 
                     if (webhookEvent.message?.text) {
                         const userMessage = webhookEvent.message.text;
+
+                        const orderIdRegex = /^[a-f0-9]{24}$/i;
+
+                        if (orderIdRegex.test(userMessage)) {
+
+                            const trackingResponse =
+                                await getOrderTracking(userMessage);
+
+                            if (trackingResponse) {
+
+                                await axios.post(
+                                    `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+                                    {
+                                        recipient: {
+                                            id: senderId,
+                                        },
+                                        message: {
+                                            text: trackingResponse,
+                                        },
+                                    }
+                                );
+
+                                console.log("Order Status Sent");
+
+                                continue;
+                            }
+                        }
 
                         const faqResponse = getFAQResponse(userMessage);
 
