@@ -202,6 +202,45 @@ app.get("/orders/:id", async (req, res) => {
 });
 
 
+app.get("/orders/phone/:phone", async (req, res) => {
+    try {
+
+        const phone = req.params.phone;
+
+        const database = await connectDB();
+
+        const orderCollection =
+            database.collection("order");
+
+        const result = await orderCollection.findOne(
+            {
+                "shipping_address.phone": phone,
+            },
+            {
+                sort: { _id: -1 },
+            }
+        );
+
+        if (!result) {
+            return res.status(404).send({
+                message: "Order not found",
+            });
+        }
+
+        res.send(result);
+
+    } catch (error) {
+
+        console.log(error);
+
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+
+});
+
+
 // Get All Orders
 app.get("/orders_data", async (req, res) => {
     try {
