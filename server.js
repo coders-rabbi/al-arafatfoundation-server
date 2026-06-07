@@ -320,16 +320,31 @@ https://flame-bd.com
     }
 
     if (
-        text.includes("track") ||
-        text.includes("tracking") ||
-        text.includes("order status") ||
-        text.includes("status") ||
-        text.includes("অর্ডার ট্র্যাক") ||
-        text.includes("অর্ডার স্ট্যাটাস")
+        (
+            text.includes("order") ||
+            text.includes("অর্ডার") ||
+            text.includes("কিভাবে অর্ডার") ||
+            text.includes("order kivabe korbo") ||
+            text.includes("order korte chai") ||
+            text.includes("order korte ki ki lagbe")
+        )
+        &&
+        !text.includes("track")
+        &&
+        !text.includes("tracking")
+        &&
+        !text.includes("status")
+        &&
+        !text.includes("অর্ডার ট্র্যাক")
+        &&
+        !text.includes("অর্ডার স্ট্যাটাস")
     ) {
-        return "📦 আপনার Order ID পাঠান।";
-    }
+        return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
 
+https://flame-bd.com
+
+পছন্দের টি-শার্ট নির্বাচন করে Checkout সম্পন্ন করুন।`;
+    }
     // Size
     if (
         text.includes("size") ||
