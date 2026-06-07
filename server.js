@@ -616,7 +616,8 @@ app.post("/webhook", async (req, res) => {
                     const senderId = webhookEvent.sender.id;
 
                     if (webhookEvent.message?.text) {
-                        const userMessage = webhookEvent.message.text;
+                        const userMessage =
+                            webhookEvent.message.text.trim();
 
                         const orderIdRegex = /^[a-f0-9]{24}$/i;
                         const phoneRegex = /^(\+8801|01)[3-9]\d{8}$/;
