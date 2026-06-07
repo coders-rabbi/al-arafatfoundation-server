@@ -606,6 +606,39 @@ async function getOrderTracking(orderId) {
     }
 }
 
+
+async function getOrderTrackingByPhone(phone) {
+    try {
+
+
+        const response = await axios.get(
+            `https://al-arafatfoundation-server-production.up.railway.app/orders/phone/${phone}`
+        );
+
+        const order = response.data;
+
+        return `📦 Order Status: ${order.orderStatus}
+
+
+🆔 Order ID: ${order._id}
+
+💰 Total: ${order.pricing.total}৳`;
+
+
+    } catch (error) {
+
+        console.log(
+            "Phone Tracking Error:",
+            error.response?.data || error.message
+        );
+
+        return null;
+    }
+
+
+}
+
+
 app.post("/webhook", async (req, res) => {
     try {
         const body = req.body;
