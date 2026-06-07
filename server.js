@@ -420,6 +420,65 @@ Rules:
     }
 }
 
+async function getProductRecommendation(userMessage) {
+    try {
+
+        const response = await axios.get(
+            "https://al-arafatfoundation-server-production.up.railway.app/products"
+        );
+
+        const products = response.data;
+
+        const text = userMessage.toLowerCase();
+
+        const matchedProducts = products.filter((product) => {
+
+            const name =
+                product.basicInfo.productName.toLowerCase();
+
+            const color =
+                product.variation.color.toLowerCase();
+
+            const tags =
+                product.organization.searchTags.join(" ").toLowerCase();
+
+            return (
+                name.includes(text) ||
+                color.includes(text) ||
+                tags.includes(text)
+            );
+        });
+
+        if (matchedProducts.length === 0) {
+            return null;
+        }
+
+        const topProducts = matchedProducts.slice(0, 3);
+
+        let reply = "🔥 আমাদের কিছু পছন্দের প্রোডাক্ট:\n\n";
+
+        topProducts.forEach((product) => {
+            reply += `🛒 ${product.basicInfo.productName}\n`;
+            reply += `💰 Price: ${product.pricingInventory.discountPrice}\n`;
+            reply += `🎨 Color: ${product.variation.color}\n\n`;
+        });
+
+        reply += "🌐 Order: https://flame-bd.com";
+
+        return reply;
+
+    } catch (error) {
+
+        console.error(
+            "Product Recommendation Error:",
+            error.message
+        );
+
+        return null;
+    }
+}
+
+
 app.post("/webhook", async (req, res) => {
     try {
         const body = req.body;
@@ -432,18 +491,32 @@ app.post("/webhook", async (req, res) => {
                     if (webhookEvent.message?.text) {
                         const userMessage = webhookEvent.message.text;
 
-                        console.log("User Message:", userMessage);
-
                         const faqResponse = getFAQResponse(userMessage);
 
                         let replyText;
 
                         if (faqResponse) {
+
                             replyText = faqResponse;
-                            console.log("FAQ Match Found");
+
                         } else {
-                            console.log("Using OpenAI...");
-                            replyText = await getAIResponse(userMessage);
+
+                            const productReply =
+                                await getProductRecommendation(userMessage);
+
+                            if (productReply) {
+
+                                console.log("Product Recommendation Found");
+
+                                replyText = productReply;
+
+                            } else {
+
+                                console.log("Using OpenAI");
+
+                                replyText =
+                                    await getAIResponse(userMessage);
+                            }
                         }
 
                         await axios.post(
