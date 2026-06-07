@@ -431,6 +431,38 @@ async function getProductRecommendation(userMessage) {
 
         const text = userMessage.toLowerCase();
 
+        let searchText = text;
+
+        // Bangla → English Color Mapping
+
+        if (
+            text.includes("কালো") ||
+            text.includes("kalo")
+        ) {
+            searchText = "black";
+        }
+
+        if (
+            text.includes("সাদা") ||
+            text.includes("shada")
+        ) {
+            searchText = "white";
+        }
+
+        if (
+            text.includes("সবুজ") ||
+            text.includes("green")
+        ) {
+            searchText = "bottle green";
+        }
+
+        if (
+            text.includes("মেরুন") ||
+            text.includes("maroon")
+        ) {
+            searchText = "maroon";
+        }
+
         const matchedProducts = products.filter((product) => {
 
             const name =
@@ -443,9 +475,9 @@ async function getProductRecommendation(userMessage) {
                 product.organization.searchTags.join(" ").toLowerCase();
 
             return (
-                name.includes(text) ||
-                color.includes(text) ||
-                tags.includes(text)
+                name.includes(searchText) ||
+                color.includes(searchText) ||
+                tags.includes(searchText)
             );
         });
 
