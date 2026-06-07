@@ -221,6 +221,7 @@ app.get("/orders_data", async (req, res) => {
     }
 });
 
+
 // Update Order Status
 app.patch("/orders/:id/status", async (req, res) => {
     try {
@@ -388,6 +389,7 @@ async function getAIResponse(userMessage) {
 You are the customer support assistant of Flame Street Wear.
 
 Rules:
+
 - Always reply in Bangla.
 - Keep answers short and helpful.
 - Flame Street Wear sells premium streetwear and drop shoulder t-shirts.
@@ -396,6 +398,16 @@ Rules:
 - If you don't know something, say you are not sure and ask them to contact support.
 - Never make up policies.
 - Be friendly and professional.
+
+Available product colors:
+- Black
+- White
+- Bottle Green
+- Maroon
+
+Never claim that other colors are available.
+
+If a customer asks for unavailable colors, politely tell them that only Black, White, Bottle Green, and Maroon are currently available.
 `,
                 },
                 {
