@@ -350,6 +350,23 @@ https://flame-bd.com
         return `💵 Cash on Delivery Available।`;
     }
 
+    // Human Support
+    if (
+        text.includes("agent") ||
+        text.includes("support") ||
+        text.includes("admin") ||
+        text.includes("human") ||
+        text.includes("customer care") ||
+        text.includes("মানুষ") ||
+        text.includes("কথা বলতে চাই") ||
+        text.includes("হেল্প") ||
+        text.includes("সাপোর্ট")
+    ) {
+        return `📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।
+
+আপনার প্রয়োজন বিস্তারিত লিখে পাঠান। আমরা যত দ্রুত সম্ভব সাহায্য করবো। ❤️`;
+    }
+
     // Exchange
     if (
         text.includes("exchange") ||
