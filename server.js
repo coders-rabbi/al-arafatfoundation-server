@@ -381,13 +381,16 @@ https://flame-bd.com
         text.includes("size") ||
         text.includes("সাইজ") ||
         text.includes("size chart") ||
-        text.includes("মাপ") ||
-        text.includes("লার্জ") ||
-        text.includes("medium") ||
-        text.includes("small") ||
-        text.includes("xl")
+        text.includes("মাপ")
     ) {
-        return "📏 আপনার উচ্চতা ও ওজন জানালে আমরা সঠিক সাইজ সাজেস্ট করতে পারি।";
+        return `📏 আপনার উচ্চতা এবং ওজন লিখুন।
+
+উদাহরণ:
+5'8" 72kg
+
+অথবা
+
+173cm 72kg`;
     }
 
     // Delivery
@@ -638,6 +641,41 @@ async function getOrderTrackingByPhone(phone) {
 
 }
 
+function getSizeRecommendation(message) {
+
+    const text = message.toLowerCase();
+
+    const weightMatch =
+        text.match(/(\d+)\s*kg/);
+
+    if (!weightMatch) {
+        return null;
+    }
+
+    const weight =
+        parseInt(weightMatch[1]);
+
+    let size = "";
+
+    if (weight <= 55) {
+        size = "M";
+    }
+
+    else if (weight <= 70) {
+        size = "L";
+    }
+
+    else if (weight <= 85) {
+        size = "XL";
+    }
+
+    else {
+        size = "XXL";
+    }
+
+    return `📏 আপনার জন্য Recommended Size: ${size}`;
+}
+
 
 app.post("/webhook", async (req, res) => {
     try {
@@ -705,8 +743,8 @@ app.post("/webhook", async (req, res) => {
                                 continue;
                             }
                         }
-
-                        const faqResponse = getFAQResponse(userMessage);
+                        const faqResponse =
+                            getFAQResponse(userMessage);
 
                         let replyText;
 
@@ -716,53 +754,80 @@ app.post("/webhook", async (req, res) => {
 
                         } else {
 
-                            const productReply =
-                                await getProductRecommendation(userMessage);
+                            const sizeReply =
+                                getSizeRecommendation(userMessage);
 
-                            if (productReply) {
+                            if (sizeReply) {
 
-                                console.log("Product Recommendation Found");
-
-                                replyText = productReply;
+                                replyText = sizeReply;
 
                             } else {
 
-                                console.log("Using OpenAI");
+                                const productReply =
+                                    await getProductRecommendation(userMessage);
 
-                                replyText =
-                                    await getAIResponse(userMessage);
+                                if (productReply) {
+
+                                    console.log(
+                                        "Product Recommendation Found"
+                                    );
+
+                                    replyText = productReply;
+
+                                } else {
+
+                                    console.log("Using OpenAI");
+
+                                    replyText =
+                                        await getAIResponse(userMessage);
+                                }
                             }
                         }
 
-                        await axios.post(
-                            `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-                            {
-                                recipient: {
-                                    id: senderId,
-                                },
-                                message: {
-                                    text: replyText,
-                                },
-                            }
-                        );
+                        if (productReply) {
 
-                        console.log("Reply Sent Successfully");
+                            console.log("Product Recommendation Found");
+
+                            replyText = productReply;
+
+                        } else {
+
+                            console.log("Using OpenAI");
+
+                            replyText =
+                                await getAIResponse(userMessage);
+                        }
                     }
+
+                    await axios.post(
+                        `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+                        {
+                            recipient: {
+                                id: senderId,
+                            },
+                            message: {
+                                text: replyText,
+                            },
+                        }
+                    );
+
+                    console.log("Reply Sent Successfully");
                 }
             }
-
-            return res.sendStatus(200);
         }
 
-        return res.sendStatus(404);
-    } catch (error) {
-        console.error(
-            "Messenger Reply Error:",
-            error.response?.data || error.message
-        );
-
-        return res.sendStatus(500);
+        return res.sendStatus(200);
     }
+
+        return res.sendStatus(404);
+} catch (error) {
+    console.error(
+        "Messenger Reply Error:",
+        error.response?.data || error.message
+    );
+
+    return res.sendStatus(500);
+}
 });
 app.get("/webhook", (req, res) => {
     const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
