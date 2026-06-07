@@ -817,10 +817,9 @@ app.post("/webhook", async (req, res) => {
         }
 
         return res.sendStatus(200);
-    }
 
         return res.sendStatus(404);
-} catch (error) {
+    } catch (error) {
     console.error(
         "Messenger Reply Error:",
         error.response?.data || error.message
