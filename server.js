@@ -536,15 +536,24 @@ async function getProductRecommendation(userMessage) {
 async function getOrderTracking(orderId) {
     try {
 
+        console.log("Tracking Order ID:", orderId);
+
         const response = await axios.get(
             `https://al-arafatfoundation-server-production.up.railway.app/orders/${orderId}`
         );
+
+        console.log("Order Response:", response.data);
 
         const order = response.data;
 
         return `📦 Order Status: ${order.orderStatus}`;
 
     } catch (error) {
+
+        console.log(
+            "Order Tracking Error:",
+            error.response?.data || error.message
+        );
 
         return null;
     }
