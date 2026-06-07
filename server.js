@@ -202,6 +202,7 @@ app.get("/orders/:id", async (req, res) => {
 });
 
 
+// get single order by phone number
 app.get("/orders/phone/:phone", async (req, res) => {
     try {
 
@@ -618,6 +619,10 @@ app.post("/webhook", async (req, res) => {
                         const userMessage = webhookEvent.message.text;
 
                         const orderIdRegex = /^[a-f0-9]{24}$/i;
+
+                        const orderIdRegex = /^[a-f0-9]{24}$/i;
+
+                        const phoneRegex = /^(\+8801|01)[3-9]\d{8}$/;
 
                         if (orderIdRegex.test(userMessage)) {
 
