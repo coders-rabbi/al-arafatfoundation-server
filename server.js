@@ -128,6 +128,31 @@ app.get("/blogs", async (req, res) => {
 
 // ================= PRODUCT ROUTES =================
 
+app.post("/product", async (req, res) => {
+    try {
+        const productData = req.body;
+        console.log("Inserting Product:", productData);
+
+        const database = await connectDB();
+
+        // কমেন্ট তুলে দেওয়া হলো যেন ডেটাবেজে ডেটা ইনসার্ট হয়
+        const productsCollection = database.collection("products");
+        const result = await productsCollection.insertOne(productData);
+
+        res.status(201).send({
+            message: "Product created successfully",
+            id: result.insertedId, // এখানে 'id' পাঠানো হলো যাতে ফ্রন্টএন্ডের 'data?.id' কন্ডিশন মেলে
+            product: productData,
+        });
+    } catch (error) {
+        console.error("Backend Error:", error);
+
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+});
+
 app.get("/products", async (req, res) => {
     try {
         const database = await connectDB();
