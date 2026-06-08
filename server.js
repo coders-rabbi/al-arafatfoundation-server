@@ -125,7 +125,6 @@ app.get("/blogs", async (req, res) => {
     }
 });
 
-
 // ================= PRODUCT ROUTES =================
 
 app.post("/product", async (req, res) => {
