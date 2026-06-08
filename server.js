@@ -307,6 +307,43 @@ app.get("/orders_data", async (req, res) => {
 });
 
 
+app.get(
+    "/human-support",
+    async (req, res) => {
+
+        try {
+
+            const database =
+                await connectDB();
+
+            const supportCollection =
+                database.collection(
+                    "human_support"
+                );
+
+            const result =
+                await supportCollection
+                    .find()
+                    .sort({
+                        createdAt: -1
+                    })
+                    .toArray();
+
+            res.send(result);
+
+        } catch (error) {
+
+            console.log(error);
+
+            res.status(500).send({
+                message:
+                    "Internal Server Error"
+            });
+        }
+    }
+);
+
+
 // Update Order Status
 app.patch("/orders/:id/status", async (req, res) => {
     try {
@@ -428,9 +465,10 @@ https://flame-bd.com
         text.includes("size chart") ||
         text.includes("মাপ")
     ) {
-        return `📏 আপনার উচ্চতা এবং ওজন লিখুন।
+        return `📏 আপনার উচ্চতা ও ওজন লিখুন।
 
 উদাহরণ:
+
 5'8" 72kg
 
 অথবা
@@ -701,32 +739,114 @@ function getSizeRecommendation(message) {
 
     const text = message.toLowerCase();
 
+    // Weight detect
     const weightMatch =
         text.match(/(\d+)\s*kg/i);
 
+    // Height detect
+    const heightFeetMatch =
+        text.match(/(\d+)['’](\d+)/);
+
+    const heightCmMatch =
+        text.match(/(\d+)\s*cm/i);
+
     if (!weightMatch) {
-        return null;
+        return "📏 দয়া করে উচ্চতা ও ওজন লিখুন।\n\nউদাহরণ:\n5'8\" 72kg";
     }
 
     const weight =
         parseInt(weightMatch[1]);
 
+    let heightCm = null;
+
+    if (heightFeetMatch) {
+
+        const feet =
+            parseInt(heightFeetMatch[1]);
+
+        const inch =
+            parseInt(heightFeetMatch[2]);
+
+        heightCm =
+            (feet * 30.48) +
+            (inch * 2.54);
+
+    }
+
+    if (heightCmMatch) {
+
+        heightCm =
+            parseInt(heightCmMatch[1]);
+
+    }
+
     let size = "";
 
-    if (weight <= 55) {
-        size = "M";
-    }
-    else if (weight <= 70) {
-        size = "L";
-    }
-    else if (weight <= 85) {
-        size = "XL";
-    }
-    else {
-        size = "XXL";
+    if (heightCm) {
+
+        if (
+            weight <= 55 &&
+            heightCm <= 170
+        ) {
+            size = "M";
+        }
+
+        else if (
+            weight <= 70 &&
+            heightCm <= 178
+        ) {
+            size = "L";
+        }
+
+        else if (
+            weight <= 85
+        ) {
+            size = "XL";
+        }
+
+        else {
+            size = "XXL";
+        }
+
+    } else {
+
+        if (weight <= 55) {
+            size = "M";
+        }
+        else if (weight <= 70) {
+            size = "L";
+        }
+        else if (weight <= 85) {
+            size = "XL";
+        }
+        else {
+            size = "XXL";
+        }
+
     }
 
     return `📏 আপনার জন্য Recommended Size: ${size}`;
+}
+
+async function saveHumanSupportRequest(
+    senderId,
+    message
+) {
+
+    const database =
+        await connectDB();
+
+    const supportCollection =
+        database.collection(
+            "human_support"
+        );
+
+    await supportCollection.insertOne({
+        senderId,
+        message,
+        status: "Pending",
+        createdAt: new Date()
+    });
 }
 
 
@@ -845,6 +965,30 @@ app.post("/webhook", async (req, res) => {
                         console.log("Product Recommendation Found");
                         replyText = productReply;
                     }
+                }
+
+                // =========================
+                // HUMAN SUPPORT
+                // =========================
+                if (
+                    !replyText &&
+                    (
+                        userMessage.toLowerCase().includes("agent") ||
+                        userMessage.toLowerCase().includes("support") ||
+                        userMessage.toLowerCase().includes("admin") ||
+                        userMessage.toLowerCase().includes("human") ||
+                        userMessage.includes("মানুষ") ||
+                        userMessage.includes("সাপোর্ট")
+                    )
+                ) {
+
+                    await saveHumanSupportRequest(
+                        senderId,
+                        userMessage
+                    );
+
+                    replyText =
+                        "📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।";
                 }
 
                 // =========================
