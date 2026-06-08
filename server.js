@@ -495,22 +495,7 @@ https://flame-bd.com
     }
 
     // Human Support
-    if (
-        text.includes("agent") ||
-        text.includes("support") ||
-        text.includes("admin") ||
-        text.includes("human") ||
-        text.includes("customer care") ||
-        text.includes("মানুষ") ||
-        text.includes("কথা বলতে চাই") ||
-        text.includes("হেল্প") ||
-        text.includes("সাপোর্ট")
-    ) {
-        return (
-            "📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।\n" +
-            "আপনার প্রয়োজন বিস্তারিত লিখে পাঠান। আমরা যত দ্রুত সম্ভব সাহায্য করবো। ❤️"
-        );
-    }
+
 
     // Exchange / Return
     if (text.includes("exchange") || text.includes("return")) {
@@ -914,11 +899,33 @@ app.post("/webhook", async (req, res) => {
                 }
 
                 // =========================
+                // HUMAN SUPPORT
+                // =========================
+                if (
+                    userMessage.toLowerCase().includes("agent") ||
+                    userMessage.toLowerCase().includes("support") ||
+                    userMessage.toLowerCase().includes("admin") ||
+                    userMessage.toLowerCase().includes("human") ||
+                    userMessage.includes("মানুষ") ||
+                    userMessage.includes("সাপোর্ট")
+                ) {
+
+                    await saveHumanSupportRequest(
+                        senderId,
+                        userMessage
+                    );
+
+                    replyText =
+                        "📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।";
+                }
+
+                // =========================
                 // 3. FAQ CHECK
                 // =========================
                 const faqResponse = getFAQResponse(userMessage);
 
-                if (faqResponse) {
+                if (faqResponse &&
+                    !replyText) {
 
                     if (
                         userMessage.toLowerCase().includes("size") ||
@@ -965,30 +972,6 @@ app.post("/webhook", async (req, res) => {
                         console.log("Product Recommendation Found");
                         replyText = productReply;
                     }
-                }
-
-                // =========================
-                // HUMAN SUPPORT
-                // =========================
-                if (
-                    !replyText &&
-                    (
-                        userMessage.toLowerCase().includes("agent") ||
-                        userMessage.toLowerCase().includes("support") ||
-                        userMessage.toLowerCase().includes("admin") ||
-                        userMessage.toLowerCase().includes("human") ||
-                        userMessage.includes("মানুষ") ||
-                        userMessage.includes("সাপোর্ট")
-                    )
-                ) {
-
-                    await saveHumanSupportRequest(
-                        senderId,
-                        userMessage
-                    );
-
-                    replyText =
-                        "📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।";
                 }
 
                 // =========================
