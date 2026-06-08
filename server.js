@@ -1010,7 +1010,7 @@ app.post("/webhook", async (req, res) => {
     try {
         const body = req.body;
 
-        if (body.object !== "page") {
+        if (body.object !== "page" && body.object !== "instagram") {
             return res.sendStatus(404);
         }
 
