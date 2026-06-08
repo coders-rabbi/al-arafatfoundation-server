@@ -283,16 +283,15 @@ app.get("/orders/phone/:phone", async (req, res) => {
         const orderCollection =
             database.collection("order");
 
-        const result = await orderCollection.findOne(
-            {
+        const result = await orderCollection
+            .find({
                 "shipping_address.phone": phone,
-            },
-            {
-                sort: { _id: -1 },
-            }
-        );
+            })
+            .sort({ _id: -1 })
+            .limit(5)
+            .toArray();
 
-        if (!result) {
+        if (!result.length) {
             return res.status(404).send({
                 message: "Order not found",
             });
@@ -711,14 +710,20 @@ async function getOrderTrackingByPhone(phone) {
             `https://al-arafatfoundation-server-production.up.railway.app/orders/phone/${phone}`
         );
 
-        const order = response.data;
+        const orders = response.data;
 
-        return `📦 Order Status: ${order.orderStatus}
+        let reply =
+            "📦 আপনার সাম্প্রতিক অর্ডারসমূহ:\n\n";
 
+        orders.forEach((order, index) => {
 
-🆔 Order ID: ${order._id}
+            reply += `${index + 1}. ${order.orderStatus}\n`;
+            reply += `🆔 ${order._id}\n`;
+            reply += `💰 ${order.pricing.total}৳\n\n`;
 
-💰 Total: ${order.pricing.total}৳`;
+        });
+
+        return reply;
 
 
     } catch (error) {
