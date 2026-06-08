@@ -633,12 +633,12 @@ https://maps.app.goo.gl/HTARddV5UartVXF87
 
 Example response:
 
-"বর্তমানে Flame Street Wear-এর কোনো ফিজিক্যাল শোরুম নেই। 😊
+"📍 বর্তমানে Flame Street Wear-এর কোনো ফিজিক্যাল শোরুম নেই। 😊
 
-আপনি অনলাইনে অর্ডার করতে পারবেন:
+🌐 আপনি অনলাইনে অর্ডার করতে পারবেন:
 https://flame-bd.com
 
-লোকেশন:
+📌 লোকেশন:
 https://maps.app.goo.gl/HTARddV5UartVXF87
 
 SUPPORT RULES
