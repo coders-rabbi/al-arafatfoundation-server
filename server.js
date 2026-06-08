@@ -734,6 +734,36 @@ async function getOrderTrackingByPhone(phone) {
 
 }
 
+async function saveMessengerLog(
+    senderId,
+    message
+) {
+    try {
+
+        const database =
+            await connectDB();
+
+        const logCollection =
+            database.collection(
+                "messenger_logs"
+            );
+
+        await logCollection.insertOne({
+            senderId,
+            message,
+            createdAt: new Date(),
+        });
+
+    } catch (error) {
+
+        console.log(
+            "Messenger Log Error:",
+            error.message
+        );
+
+    }
+}
+
 
 const userStates = {};
 
@@ -874,7 +904,14 @@ app.post("/webhook", async (req, res) => {
 
                 if (!senderId || !webhookEvent.message?.text) continue;
 
-                const userMessage = webhookEvent.message.text.trim();
+                const userMessage =
+                    webhookEvent.message.text.trim();
+
+                await saveMessengerLog(
+                    senderId,
+                    userMessage
+                );
+
                 const userState =
                     await getUserState(senderId);
 
