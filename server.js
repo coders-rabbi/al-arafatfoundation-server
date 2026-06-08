@@ -54,6 +54,51 @@ async function connectDB() {
     }
 }
 
+
+async function setUserState(senderId, state) {
+
+    const database = await connectDB();
+
+    const stateCollection =
+        database.collection("messenger_state");
+
+    await stateCollection.updateOne(
+        { senderId },
+        {
+            $set: {
+                senderId,
+                state,
+                updatedAt: new Date(),
+            },
+        },
+        { upsert: true }
+    );
+}
+
+async function getUserState(senderId) {
+
+    const database = await connectDB();
+
+    const stateCollection =
+        database.collection("messenger_state");
+
+    return await stateCollection.findOne({
+        senderId,
+    });
+}
+
+async function clearUserState(senderId) {
+
+    const database = await connectDB();
+
+    const stateCollection =
+        database.collection("messenger_state");
+
+    await stateCollection.deleteOne({
+        senderId,
+    });
+}
+
 // Root Route
 app.get("/", (req, res) => {
     res.send("Hello Al Arafat Foundation!");
@@ -689,6 +734,8 @@ app.post("/webhook", async (req, res) => {
                 if (!senderId || !webhookEvent.message?.text) continue;
 
                 const userMessage = webhookEvent.message.text.trim();
+                const userState =
+                    await getUserState(senderId);
 
                 const orderIdRegex = /^[a-f0-9]{24}$/i;
                 const phoneRegex = /^(\+8801|01)[3-9]\d{8}$/;
@@ -739,7 +786,20 @@ app.post("/webhook", async (req, res) => {
                 // 3. FAQ CHECK
                 // =========================
                 const faqResponse = getFAQResponse(userMessage);
+
                 if (faqResponse) {
+
+                    if (
+                        userMessage.toLowerCase().includes("size") ||
+                        userMessage.toLowerCase().includes("সাইজ") ||
+                        userMessage.toLowerCase().includes("মাপ")
+                    ) {
+                        await setUserState(
+                            senderId,
+                            "waiting_for_size"
+                        );
+                    }
+
                     replyText = faqResponse;
                 }
 
