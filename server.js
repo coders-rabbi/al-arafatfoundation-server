@@ -1003,10 +1003,10 @@ async function saveHumanSupportRequest(
 
 
 app.post("/webhook", async (req, res) => {
-    console.log(
-        "WEBHOOK RECEIVED:",
-        JSON.stringify(req.body, null, 2)
-    );
+    // console.log(
+    //     "WEBHOOK RECEIVED:",
+    //     JSON.stringify(req.body, null, 2)
+    // );
     try {
         const body = req.body;
 
