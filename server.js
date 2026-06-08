@@ -200,7 +200,40 @@ app.get("/products/:id", async (req, res) => {
     }
 });
 
+app.delete("/product/:id", async (req, res) => {
+    try {
+        const productID = req.params.id;
 
+        // ObjectId ভ্যালিড কিনা চেক করা
+        if (!ObjectId.isValid(productID)) {
+            return res.status(400).send({
+                message: "Invalid Product ID format",
+            });
+        }
+
+        const database = await connectDB();
+        const productsCollection = database.collection("products");
+
+        const result = await productsCollection.deleteOne({
+            _id: new ObjectId(productID),
+        });
+
+        if (!result.deletedCount) {
+            return res.status(404).send({
+                message: "Product not found",
+            });
+        }
+
+        res.send({
+            message: "Product deleted successfully",
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+});
 // ================= ORDER ROUTES =================
 
 // Create Order
