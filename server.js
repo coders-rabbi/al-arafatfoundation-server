@@ -660,15 +660,12 @@ function getSizeRecommendation(message) {
     if (weight <= 55) {
         size = "M";
     }
-
     else if (weight <= 70) {
         size = "L";
     }
-
     else if (weight <= 85) {
         size = "XL";
     }
-
     else {
         size = "XXL";
     }
