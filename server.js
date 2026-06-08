@@ -686,12 +686,23 @@ async function getOrderTrackingByPhone(phone) {
 
 }
 
+
+const userStates = {};
+
+async function getUserState(senderId) {
+    return userStates[senderId] || null;
+}
+
+async function setUserState(senderId, state) {
+    userStates[senderId] = state;
+}
+
 function getSizeRecommendation(message) {
 
     const text = message.toLowerCase();
 
     const weightMatch =
-        text.match(/(\d+)\s*kg/);
+        text.match(/(\d+)\s*kg/i);
 
     if (!weightMatch) {
         return null;
@@ -806,10 +817,22 @@ app.post("/webhook", async (req, res) => {
                 // =========================
                 // 4. SIZE RECOMMENDATION
                 // =========================
-                if (!replyText) {
-                    const sizeReply = getSizeRecommendation(userMessage);
+                if (
+                    !replyText &&
+                    userState === "waiting_for_size"
+                ) {
+
+                    const sizeReply =
+                        getSizeRecommendation(userMessage);
+
                     if (sizeReply) {
+
                         replyText = sizeReply;
+
+                        await setUserState(
+                            senderId,
+                            null
+                        );
                     }
                 }
 
