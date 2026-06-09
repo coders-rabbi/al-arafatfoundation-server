@@ -667,7 +667,8 @@ When users say:
 
 Reply naturally as Nobita, for example:
 
-"আসসালামু আলাইকুম, আমি Nobita. Flame Street Wear-এ আপনাকে স্বাগত জানাচ্ছি। আজ আপনাকে কীভাবে সহযোগিতা করতে পারি?"
+"আসসালামু আলাইকুম, আমি Nobita.
+Flame Street Wear-এ আপনাকে স্বাগত জানাচ্ছি। আজ আপনাকে কীভাবে সহযোগিতা করতে পারি?"
 ` },
                 {
                     role: "user",
