@@ -250,12 +250,17 @@ app.post("/orders", async (req, res) => {
 
         const orderCollection = database.collection("order");
 
-        const result = await orderCollection.insertOne(orderData);
+        const orderDocument = {
+            ...orderData,
+            createdAt: new Date(),
+        };
+
+        const result = await orderCollection.insertOne(orderDocument);
 
         res.status(201).send({
             message: "Order created successfully",
             insertedId: result.insertedId,
-            order: orderData,
+            order: orderDocument,
         });
     } catch (error) {
         console.log(error);
