@@ -378,10 +378,43 @@ app.get("/orders/phone/:phone", async (req, res) => {
 app.get("/orders_data", async (req, res) => {
     try {
         const database = await connectDB();
-
         const orderCollection = database.collection("order");
 
-        const result = await orderCollection.find().toArray();
+        // ১. অল-অর্ডারের জন্য Aggregation Pipeline তৈরি
+        const pipeline = [
+            // ২. $lookup দিয়ে প্রোডাক্টের কাস্টম 'id' এর সাথে অর্ডারের 'productId' মেলানো
+            {
+                $lookup: {
+                    from: "products", // আপনার প্রোডাক্ট কালেকশনের নাম
+                    let: { orderProdId: "$product.productId" }, // অর্ডারের স্ট্রিং আইডি যেমন: "3"
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    // প্রোডাক্টের numeric id-কে স্ট্রিং বানিয়ে অর্ডারের productId-র সাথে তুলনা করা হচ্ছে
+                                    $eq: [{ $toString: "$id" }, "$$orderProdId"]
+                                }
+                            }
+                        }
+                    ],
+                    as: "productDetails" // ফ্রন্টএন্ডে এই নামে পুরো অবজেক্টটি যুক্ত হবে
+                }
+            },
+            // ৩. অ্যারে থেকে অবজেক্টে রূপান্তর করা যেন সহজে ফ্রন্টএন্ড রিড করতে পারে
+            {
+                $unwind: {
+                    path: "$productDetails",
+                    preserveNullAndEmptyArrays: true // কোনো প্রোডাক্ট ডিলিট হয়ে গেলেও যেন অর্ডার লিস্ট থেকে গায়েব না হয়
+                }
+            },
+            // ৪. রিসেন্ট বা নতুন অর্ডারগুলো যেন টেবিলের সবার উপরে দেখায় (Sort by newest)
+            {
+                $sort: { createdAt: -1 }
+            }
+        ];
+
+        // .find().toArray() এর বদলে .aggregate(pipeline).toArray() ব্যবহার করা হয়েছে
+        const result = await orderCollection.aggregate(pipeline).toArray();
 
         res.send(result);
     } catch (error) {
