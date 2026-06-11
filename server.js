@@ -292,8 +292,8 @@ app.get("/orders/:id", async (req, res) => {
             },
             {
                 $lookup: {
-                    from: "products", // আপনার প্রোডাক্ট কালেকশনের নাম
-                    let: { orderProdId: "$product.productId" }, // অর্ডারের স্ট্রিং আইডি ("3") ভেরিয়েবলে নিলাম
+                    from: "products",
+                    let: { orderProdId: "$product.productId" },
                     pipeline: [
                         {
                             $match: {
@@ -304,14 +304,13 @@ app.get("/orders/:id", async (req, res) => {
                             }
                         }
                     ],
-                    as: "productDetails" // এই নামে প্রোডাক্টের পুরো ডাটা আসবে
+                    as: "productDetails"
                 }
             },
-            // ৩. অ্যারে থেকে অবজেক্টে রূপান্তর করা যেন ফ্রন্টএন্ডে সহজে ব্যবহার করা যায়
             {
                 $unwind: {
                     path: "$productDetails",
-                    preserveNullAndEmptyArrays: true // কোনো কারণে প্রোডাক্ট ডিলিট হলেও যেন অর্ডার ক্র্যাশ না করে
+                    preserveNullAndEmptyArrays: true
                 }
             }
         ];
@@ -324,7 +323,7 @@ app.get("/orders/:id", async (req, res) => {
             });
         }
 
-        // সিঙ্গেল অর্ডার অবজেক্টটি রেসপন্স হিসেবে পাঠানো
+
         res.send(orders[0]);
 
     } catch (error) {
