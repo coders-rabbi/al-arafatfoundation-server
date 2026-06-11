@@ -277,7 +277,6 @@ app.get("/orders/:id", async (req, res) => {
     try {
         const orderID = req.params.id;
 
-        // Validate ObjectId
         if (!ObjectId.isValid(orderID)) {
             return res.status(400).send({
                 message: "Invalid Order ID",
@@ -288,29 +287,37 @@ app.get("/orders/:id", async (req, res) => {
         const orderCollection = database.collection("order");
 
         const pipeline = [
-            // ১. নির্দিষ্ট অর্ডার আইডি দিয়ে ফিল্টার করা
             {
                 $match: { _id: new ObjectId(orderID) }
             },
-            // ২. lookup করা
             {
                 $lookup: {
-                    from: "products",
-                    localField: "product.productId",
-                    foreignField: "_id",
-                    as: "productDetails"
+                    from: "products", // আপনার প্রোডাক্ট কালেকশনের নাম
+                    let: { orderProdId: "$product.productId" }, // অর্ডারের স্ট্রিং আইডি ("3") ভেরিয়েবলে নিলাম
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+
+                                    $eq: ["$id", { $toInt: "$$orderProdId" }]
+                                }
+                            }
+                        }
+                    ],
+                    as: "productDetails" // এই নামে প্রোডাক্টের পুরো ডাটা আসবে
                 }
             },
+            // ৩. অ্যারে থেকে অবজেক্টে রূপান্তর করা যেন ফ্রন্টএন্ডে সহজে ব্যবহার করা যায়
             {
                 $unwind: {
                     path: "$productDetails",
-                    preserveNullAndEmptyArrays: true
+                    preserveNullAndEmptyArrays: true // কোনো কারণে প্রোডাক্ট ডিলিট হলেও যেন অর্ডার ক্র্যাশ না করে
                 }
             }
         ];
 
         const orders = await orderCollection.aggregate(pipeline).toArray();
-        // যেহেতু aggregate সব সময় অ্যারে রিটার্ন করে, তাই প্রথম ইনডেক্স চেক করতে হবে
+
         if (!orders || orders.length === 0) {
             return res.status(404).send({
                 message: "Order not found",
@@ -501,6 +508,8 @@ app.patch("/orders/:id/status", async (req, res) => {
 });
 
 
+
+// Webhook start
 function getFAQResponse(message) {
     const text = (message || "").toLowerCase();
 
