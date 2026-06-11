@@ -285,23 +285,43 @@ app.get("/orders/:id", async (req, res) => {
         }
 
         const database = await connectDB();
-
         const orderCollection = database.collection("order");
 
-        const result = await orderCollection.findOne({
-            _id: new ObjectId(orderID),
-        });
+        const pipeline = [
+            // ১. নির্দিষ্ট অর্ডার আইডি দিয়ে ফিল্টার করা
+            {
+                $match: { _id: new ObjectId(orderID) }
+            },
+            // ২. lookup করা
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "product.productId",
+                    foreignField: "_id",
+                    as: "productDetails"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$productDetails",
+                    preserveNullAndEmptyArrays: true
+                }
+            }
+        ];
 
-        if (!result) {
+        const orders = await orderCollection.aggregate(pipeline).toArray();
+        // যেহেতু aggregate সব সময় অ্যারে রিটার্ন করে, তাই প্রথম ইনডেক্স চেক করতে হবে
+        if (!orders || orders.length === 0) {
             return res.status(404).send({
                 message: "Order not found",
             });
         }
 
-        res.send(result);
+        // সিঙ্গেল অর্ডার অবজেক্টটি রেসপন্স হিসেবে পাঠানো
+        res.send(orders[0]);
+
     } catch (error) {
         console.log(error);
-
         res.status(500).send({
             message: "Internal Server Error",
         });
