@@ -247,11 +247,19 @@ app.post("/orders", async (req, res) => {
         }
 
         const database = await connectDB();
-
         const orderCollection = database.collection("order");
+
+        const lastOrder = await orderCollection.findOne({}, { sort: { _id: -1 } });
+        let nextOrderId = "FLA260001";
+
+        if (lastOrder && lastOrder.orderId) {
+            const currentNumber = parseInt(lastOrder.orderId.replace("FLA", ""), 10);
+            nextOrderId = `FLA${currentNumber + 1}`;
+        }
 
         const orderDocument = {
             ...orderData,
+            orderId: nextOrderId,
             createdAt: new Date(),
         };
 
