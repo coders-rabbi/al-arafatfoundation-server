@@ -179,8 +179,14 @@ app.get("/products/:id", async (req, res) => {
 
         const productsCollection = database.collection("products");
 
+        // প্রথমে চেক করে নেওয়া ভালো productID যদি Number-এ কনভার্ট করা যায়
+        const numericID = Number(productID);
+
         const result = await productsCollection.findOne({
-            id: Number(productID),
+            $or: [
+                { id: productID },           // আইডি যদি স্ট্রিং হয় (যেমন: "SUM260001")
+                { id: isNaN(numericID) ? null : numericID } // আইডি যদি নাম্বার হয় (যেমন: 1)
+            ]
         });
 
         if (!result) {
