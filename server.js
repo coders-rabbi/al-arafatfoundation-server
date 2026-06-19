@@ -290,7 +290,7 @@ app.post("/orders", async (req, res) => {
 app.get("/orders/:id", async (req, res) => {
     try {
         const orderID = req.params.id;
-        console.log(orderID)
+        // console.log(orderID)
 
         if (!ObjectId.isValid(orderID)) {
             return res.status(400).send({
