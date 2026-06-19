@@ -1235,10 +1235,10 @@ app.post("/webhook", async (req, res) => {
                 // =========================
                 // 6. AI FALLBACK
                 // =========================
-                if (!replyText) {
-                    console.log("Using OpenAI");
-                    replyText = await getAIResponse(userMessage);
-                }
+                // if (!replyText) {
+                //     console.log("Using OpenAI");
+                //     replyText = await getAIResponse(userMessage);
+                // }
 
                 // =========================
                 // SEND RESPONSE
