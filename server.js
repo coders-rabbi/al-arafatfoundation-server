@@ -290,6 +290,7 @@ app.post("/orders", async (req, res) => {
 app.get("/orders/:id", async (req, res) => {
     try {
         const orderID = req.params.id;
+        console.log(orderID)
 
         if (!ObjectId.isValid(orderID)) {
             return res.status(400).send({
@@ -312,8 +313,8 @@ app.get("/orders/:id", async (req, res) => {
                         {
                             $match: {
                                 $expr: {
-
-                                    $eq: ["$id", { $toInt: "$$orderProdId" }]
+                                    // $toInt বাদ দিয়ে সরাসরি দুটি স্ট্রিং তুলনা করা হয়েছে
+                                    $eq: ["$id", "$$orderProdId"]
                                 }
                             }
                         }
@@ -328,7 +329,6 @@ app.get("/orders/:id", async (req, res) => {
                 }
             }
         ];
-
         const orders = await orderCollection.aggregate(pipeline).toArray();
 
         if (!orders || orders.length === 0) {
