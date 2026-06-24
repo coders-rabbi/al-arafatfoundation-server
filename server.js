@@ -1243,17 +1243,17 @@ app.post("/webhook", async (req, res) => {
                 // =========================
                 // SEND RESPONSE
                 // =========================
-                if (replyText) {
-                    await axios.post(
-                        `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-                        {
-                            recipient: { id: senderId },
-                            message: { text: replyText },
-                        }
-                    );
+                // if (replyText) {
+                //     await axios.post(
+                //         `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+                //         {
+                //             recipient: { id: senderId },
+                //             message: { text: replyText },
+                //         }
+                //     );
 
-                    console.log("Reply Sent Successfully");
-                }
+                //     console.log("Reply Sent Successfully");
+                // }
             }
         }
 
