@@ -501,6 +501,7 @@ app.patch("/orders/:id/status", async (req, res) => {
             "Out for Delivery",
             "Delivered",
             "Canceled",
+            "Returned"
         ];
 
         if (!validStatuses.includes(orderStatus)) {
