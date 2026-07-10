@@ -125,6 +125,23 @@ app.get("/blogs", async (req, res) => {
     }
 });
 
+
+//===============writers card ======================
+app.get("/writers", async (req, res) => {
+    try {
+        const database = await connectDB();
+        const writersCollection = database.collection("writers");
+        const result = await writersCollection.find().toArray();
+        res.send(result);
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+})
+
 // ================= PRODUCT ROUTES =================
 
 app.post("/product", async (req, res) => {
