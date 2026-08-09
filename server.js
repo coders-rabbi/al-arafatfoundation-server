@@ -99,6 +99,24 @@ async function clearUserState(senderId) {
     });
 }
 
+function getNextOrderId(lastOrderId, prefix, fallbackNumber = 260001) {
+    if (!lastOrderId || typeof lastOrderId !== "string") {
+        return `${prefix}${fallbackNumber}`;
+    }
+
+    const numberPart = lastOrderId.startsWith(prefix)
+        ? lastOrderId.slice(prefix.length)
+        : lastOrderId.replace(prefix, "");
+
+    const currentNumber = parseInt(numberPart, 10);
+
+    if (Number.isNaN(currentNumber)) {
+        return `${prefix}${fallbackNumber}`;
+    }
+
+    return `${prefix}${currentNumber + 1}`;
+}
+
 // Root Route
 app.get("/", (req, res) => {
     res.send("Hello Al Arafat Foundation!");
@@ -273,12 +291,7 @@ app.post("/orders", async (req, res) => {
         const orderCollection = database.collection("order");
 
         const lastOrder = await orderCollection.findOne({}, { sort: { _id: -1 } });
-        let nextOrderId = "FLA260001";
-
-        if (lastOrder && lastOrder.orderId) {
-            const currentNumber = parseInt(lastOrder.orderId.replace("FLA", ""), 10);
-            nextOrderId = `FLA${currentNumber + 1}`;
-        }
+        const nextOrderId = getNextOrderId(lastOrder?.orderId, "FLA", 260001);
 
         const orderDocument = {
             ...orderData,
@@ -301,6 +314,47 @@ app.post("/orders", async (req, res) => {
         });
     }
 });
+
+
+app.post("/custom-order", async (req, res) => {
+    try {
+        const customOrder = req.body;
+
+        if (!customOrder || Object.keys(customOrder).length === 0) {
+            return res.status(400).send({
+                message: "Custom Order data is required",
+            });
+        }
+
+        const database = await connectDB();
+        const customOrderCollection = database.collection("custom-order");
+
+        const lastOrder = await customOrderCollection.findOne({}, { sort: { _id: -1 } });
+        const nextOrderId = getNextOrderId(lastOrder?.orderId, "FLAC", 260001);
+
+        const orderDocument = {
+            ...customOrder,
+            orderId: nextOrderId,
+            createdAt: new Date(),
+        };
+
+        const result = await customOrderCollection.insertOne(orderDocument);
+        // console.log(orderDocument)
+
+        res.status(201).send({
+            message: "Order created successfully",
+            insertedId: result.insertedId,
+            order: orderDocument,
+        });
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+});
+
 
 
 // Get Single Order
