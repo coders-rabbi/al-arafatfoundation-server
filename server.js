@@ -628,221 +628,221 @@ app.patch("/orders/:id/status", async (req, res) => {
 
 
 // Webhook start
-function getFAQResponse(message) {
-    const text = (message || "").toLowerCase();
+// function getFAQResponse(message) {
+//     const text = (message || "").toLowerCase();
 
-    // Order Tracking
-    if (
-        text.includes("track") ||
-        text.includes("tracking") ||
-        text.includes("order status") ||
-        text.includes("status") ||
-        text.includes("অর্ডার ট্র্যাক") ||
-        text.includes("অর্ডার স্ট্যাটাস")
-    ) {
-        return "📦 আপনার Order ID অথবা ফোন নম্বর পাঠান।";
-    }
+//     // Order Tracking
+//     if (
+//         text.includes("track") ||
+//         text.includes("tracking") ||
+//         text.includes("order status") ||
+//         text.includes("status") ||
+//         text.includes("অর্ডার ট্র্যাক") ||
+//         text.includes("অর্ডার স্ট্যাটাস")
+//     ) {
+//         return "📦 আপনার Order ID অথবা ফোন নম্বর পাঠান।";
+//     }
 
-    // Order
-    if (
-        (
-            text.includes("order") ||
-            text.includes("অর্ডার") ||
-            text.includes("কিভাবে অর্ডার") ||
-            text.includes("order kivabe korbo") ||
-            text.includes("order korte chai") ||
-            text.includes("order korte ki ki lagbe")
-        ) &&
-        !text.includes("track") &&
-        !text.includes("tracking") &&
-        !text.includes("status") &&
-        !text.includes("অর্ডার ট্র্যাক") &&
-        !text.includes("অর্ডার স্ট্যাটাস")
-    ) {
-        return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
+//     // Order
+//     if (
+//         (
+//             text.includes("order") ||
+//             text.includes("অর্ডার") ||
+//             text.includes("কিভাবে অর্ডার") ||
+//             text.includes("order kivabe korbo") ||
+//             text.includes("order korte chai") ||
+//             text.includes("order korte ki ki lagbe")
+//         ) &&
+//         !text.includes("track") &&
+//         !text.includes("tracking") &&
+//         !text.includes("status") &&
+//         !text.includes("অর্ডার ট্র্যাক") &&
+//         !text.includes("অর্ডার স্ট্যাটাস")
+//     ) {
+//         return `🛒 অর্ডার করতে আমাদের ওয়েবসাইট ভিজিট করুন:
 
-https://flame-bd.com
+// https://flame-bd.com
 
-পছন্দের টি-শার্ট নির্বাচন করে Checkout সম্পন্ন করুন।`;
-    }
+// পছন্দের টি-শার্ট নির্বাচন করে Checkout সম্পন্ন করুন।`;
+//     }
 
-    // Size
-    if (
-        text.includes("size") ||
-        text.includes("সাইজ") ||
-        text.includes("size chart") ||
-        text.includes("মাপ")
-    ) {
-        return `📏 আপনার উচ্চতা ও ওজন লিখুন।
+//     // Size
+//     if (
+//         text.includes("size") ||
+//         text.includes("সাইজ") ||
+//         text.includes("size chart") ||
+//         text.includes("মাপ")
+//     ) {
+//         return `📏 আপনার উচ্চতা ও ওজন লিখুন।
 
-উদাহরণ:
+// উদাহরণ:
 
-5'8" 72kg
+// 5'8" 72kg
 
-অথবা
+// অথবা
 
-173cm 72kg`;
-    }
+// 173cm 72kg`;
+//     }
 
-    // Delivery
-    if (
-        text.includes("delivery") ||
-        text.includes("ডেলিভারি") ||
-        text.includes("shipping")
-    ) {
-        return "🚚 আমরা সারা বাংলাদেশে ডেলিভারি করে থাকি।";
-    }
+//     // Delivery
+//     if (
+//         text.includes("delivery") ||
+//         text.includes("ডেলিভারি") ||
+//         text.includes("shipping")
+//     ) {
+//         return "🚚 আমরা সারা বাংলাদেশে ডেলিভারি করে থাকি।";
+//     }
 
-    // Payment
-    if (
-        text.includes("payment") ||
-        text.includes("cod") ||
-        text.includes("cash on delivery")
-    ) {
-        return "💵 Cash on Delivery Available।";
-    }
+//     // Payment
+//     if (
+//         text.includes("payment") ||
+//         text.includes("cod") ||
+//         text.includes("cash on delivery")
+//     ) {
+//         return "💵 Cash on Delivery Available।";
+//     }
 
-    // Human Support
-
-
-    // Exchange / Return
-    if (text.includes("exchange") || text.includes("return")) {
-        return "🔄 পণ্যে কোনো সমস্যা থাকলে আমাদের সাথে যোগাযোগ করুন।";
-    }
-
-    return null;
-
-}
+//     // Human Support
 
 
-async function getAIResponse(userMessage) {
-    try {
-        const response = await openai.chat.completions.create({
-            model: "gpt-4.1-mini",
-            messages: [
-                {
-                    role: "system",
-                    content: `
-You are Nobita, the official AI customer support assistant of Flame Street Wear.
+//     // Exchange / Return
+//     if (text.includes("exchange") || text.includes("return")) {
+//         return "🔄 পণ্যে কোনো সমস্যা থাকলে আমাদের সাথে যোগাযোগ করুন।";
+//     }
 
-ABOUT FLAME STREET WEAR
+//     return null;
 
-- Flame Street Wear sells premium streetwear and drop shoulder t-shirts.
-- Official website: https://flame-bd.com
-- Always represent Flame Street Wear professionally.
+// }
 
-LANGUAGE RULES
 
-- Always reply in Bangla.
-- Keep responses short, helpful and natural.
-- Use friendly customer support tone.
-- Avoid long explanations unless asked.
+// async function getAIResponse(userMessage) {
+//     try {
+//         const response = await openai.chat.completions.create({
+//             model: "gpt-4.1-mini",
+//             messages: [
+//                 {
+//                     role: "system",
+//                     content: `
+// You are Nobita, the official AI customer support assistant of Flame Street Wear.
 
-IDENTITY RULES
+// ABOUT FLAME STREET WEAR
 
-- Your name is Nobita.
-- You are the official AI assistant of Flame Street Wear.
-- If someone asks your name, introduce yourself as Nobita.
-- If someone asks "who are you", "তুমি কে", "আপনি কে", explain that you are Nobita, the AI assistant of Flame Street Wear.
-- Never claim that your name is ChatGPT.
-- Do not mention OpenAI unless directly asked.
+// - Flame Street Wear sells premium streetwear and drop shoulder t-shirts.
+// - Official website: https://flame-bd.com
+// - Always represent Flame Street Wear professionally.
 
-ORDER RULES
+// LANGUAGE RULES
 
-- If a customer wants to place an order, direct them to:
-  https://flame-bd.com
+// - Always reply in Bangla.
+// - Keep responses short, helpful and natural.
+// - Use friendly customer support tone.
+// - Avoid long explanations unless asked.
 
-SIZE RULES
+// IDENTITY RULES
 
-- If someone asks about size, ask for height and weight.
-- After receiving height and weight, recommend the most suitable size.
+// - Your name is Nobita.
+// - You are the official AI assistant of Flame Street Wear.
+// - If someone asks your name, introduce yourself as Nobita.
+// - If someone asks "who are you", "তুমি কে", "আপনি কে", explain that you are Nobita, the AI assistant of Flame Street Wear.
+// - Never claim that your name is ChatGPT.
+// - Do not mention OpenAI unless directly asked.
 
-PRODUCT COLOR RULES
+// ORDER RULES
 
-Currently available colors:
+// - If a customer wants to place an order, direct them to:
+//   https://flame-bd.com
 
-- Black
-- White
-- Bottle Green
-- Maroon
+// SIZE RULES
 
-- Never claim that any other color is available.
-- If someone asks for unavailable colors, politely explain that only Black, White, Bottle Green and Maroon are currently available.
+// - If someone asks about size, ask for height and weight.
+// - After receiving height and weight, recommend the most suitable size.
 
-TRACKING RULES
+// PRODUCT COLOR RULES
 
-- Customers can track orders using Order ID or phone number.
-- If tracking information is unavailable, politely ask them to contact support.
+// Currently available colors:
 
-LOCATION RULES
+// - Black
+// - White
+// - Bottle Green
+// - Maroon
 
-- Flame Street Wear currently does not have a physical showroom.
-- If a customer asks for shop location, address, showroom location, office address, or where Flame Street Wear is located, explain that there is currently no physical showroom.
-- Customers can order online through https://flame-bd.com.
-- If needed, share this Google Maps location:
+// - Never claim that any other color is available.
+// - If someone asks for unavailable colors, politely explain that only Black, White, Bottle Green and Maroon are currently available.
 
-https://maps.app.goo.gl/HTARddV5UartVXF87
+// TRACKING RULES
 
-Example response:
+// - Customers can track orders using Order ID or phone number.
+// - If tracking information is unavailable, politely ask them to contact support.
 
-"📍 বর্তমানে Flame Street Wear-এর কোনো ফিজিক্যাল শোরুম নেই। 😊
+// LOCATION RULES
 
-🌐 আপনি অনলাইনে অর্ডার করতে পারবেন:
-https://flame-bd.com
+// - Flame Street Wear currently does not have a physical showroom.
+// - If a customer asks for shop location, address, showroom location, office address, or where Flame Street Wear is located, explain that there is currently no physical showroom.
+// - Customers can order online through https://flame-bd.com.
+// - If needed, share this Google Maps location:
 
-📌 লোকেশন:
-https://maps.app.goo.gl/HTARddV5UartVXF87
+// https://maps.app.goo.gl/HTARddV5UartVXF87
 
-SUPPORT RULES
+// Example response:
 
-- If a customer requests human support, tell them that the support team will contact them soon.
-- Do not promise anything that is not confirmed.
+// "📍 বর্তমানে Flame Street Wear-এর কোনো ফিজিক্যাল শোরুম নেই। 😊
 
-SAFETY RULES
+// 🌐 আপনি অনলাইনে অর্ডার করতে পারবেন:
+// https://flame-bd.com
 
-- Never make up policies.
-- Never invent delivery times.
-- Never invent stock information.
-- Never invent discounts or offers.
-- If you are unsure, politely say that you are not certain and ask the customer to contact support.
+// 📌 লোকেশন:
+// https://maps.app.goo.gl/HTARddV5UartVXF87
 
-GREETING RULES
+// SUPPORT RULES
 
-When users say:
-- Hi
-- Hello
-- Hey
-- Bro
-- Assalamu Alaikum
-- হাই
-- হ্যালো
+// - If a customer requests human support, tell them that the support team will contact them soon.
+// - Do not promise anything that is not confirmed.
 
-Reply naturally as Nobita, for example:
+// SAFETY RULES
 
-"আসসালামু আলাইকুম, আমি Nobita.
-Flame Street Wear-এ আপনাকে স্বাগত জানাচ্ছি। আজ আপনাকে কীভাবে সহযোগিতা করতে পারি?"
-` },
-                {
-                    role: "user",
-                    content: userMessage,
-                },
-            ],
-            max_tokens: 150,
-        });
+// - Never make up policies.
+// - Never invent delivery times.
+// - Never invent stock information.
+// - Never invent discounts or offers.
+// - If you are unsure, politely say that you are not certain and ask the customer to contact support.
 
-        return (
-            response.choices?.[0]?.message?.content ||
-            "দুঃখিত, আমি এই মুহূর্তে উত্তর দিতে পারছি না।"
-        );
-    } catch (error) {
-        console.error(
-            "OpenAI Error:",
-            error.response?.data || error.message
-        );
+// GREETING RULES
 
-        return "দুঃখিত, এই মুহূর্তে AI সহকারী সাময়িকভাবে উপলব্ধ নয়।";
-    }
-}
+// When users say:
+// - Hi
+// - Hello
+// - Hey
+// - Bro
+// - Assalamu Alaikum
+// - হাই
+// - হ্যালো
+
+// Reply naturally as Nobita, for example:
+
+// "আসসালামু আলাইকুম, আমি Nobita.
+// Flame Street Wear-এ আপনাকে স্বাগত জানাচ্ছি। আজ আপনাকে কীভাবে সহযোগিতা করতে পারি?"
+// ` },
+//                 {
+//                     role: "user",
+//                     content: userMessage,
+//                 },
+//             ],
+//             max_tokens: 150,
+//         });
+
+//         return (
+//             response.choices?.[0]?.message?.content ||
+//             "দুঃখিত, আমি এই মুহূর্তে উত্তর দিতে পারছি না।"
+//         );
+//     } catch (error) {
+//         console.error(
+//             "OpenAI Error:",
+//             error.response?.data || error.message
+//         );
+
+//         return "দুঃখিত, এই মুহূর্তে AI সহকারী সাময়িকভাবে উপলব্ধ নয়।";
+//     }
+// }
 
 async function getProductRecommendation(userMessage) {
     try {
@@ -934,69 +934,69 @@ async function getProductRecommendation(userMessage) {
     }
 }
 
-async function getOrderTracking(orderId) {
-    try {
+// async function getOrderTracking(orderId) {
+//     try {
 
-        console.log("Tracking Order ID:", orderId);
+//         console.log("Tracking Order ID:", orderId);
 
-        const response = await axios.get(
-            `https://al-arafatfoundation-server-production.up.railway.app/orders/${orderId}`
-        );
+//         const response = await axios.get(
+//             `https://al-arafatfoundation-server-production.up.railway.app/orders/${orderId}`
+//         );
 
-        console.log("Order Response:", response.data);
+//         console.log("Order Response:", response.data);
 
-        const order = response.data;
+//         const order = response.data;
 
-        return `📦 Order Status: ${order.orderStatus}`;
+//         return `📦 Order Status: ${order.orderStatus}`;
 
-    } catch (error) {
+//     } catch (error) {
 
-        console.log(
-            "Order Tracking Error:",
-            error.response?.data || error.message
-        );
+//         console.log(
+//             "Order Tracking Error:",
+//             error.response?.data || error.message
+//         );
 
-        return null;
-    }
-}
-
-
-async function getOrderTrackingByPhone(phone) {
-    try {
+//         return null;
+//     }
+// }
 
 
-        const response = await axios.get(
-            `https://al-arafatfoundation-server-production.up.railway.app/orders/phone/${phone}`
-        );
-
-        const orders = response.data;
-
-        let reply =
-            "📦 আপনার সাম্প্রতিক অর্ডারসমূহ:\n\n";
-
-        orders.forEach((order, index) => {
-
-            reply += `${index + 1}. ${order.orderStatus}\n`;
-            reply += `🆔 ${order._id}\n`;
-            reply += `💰 ${order.pricing.total}৳\n\n`;
-
-        });
-
-        return reply;
+// async function getOrderTrackingByPhone(phone) {
+//     try {
 
 
-    } catch (error) {
+//         const response = await axios.get(
+//             `https://al-arafatfoundation-server-production.up.railway.app/orders/phone/${phone}`
+//         );
 
-        console.log(
-            "Phone Tracking Error:",
-            error.response?.data || error.message
-        );
+//         const orders = response.data;
 
-        return null;
-    }
+//         let reply =
+//             "📦 আপনার সাম্প্রতিক অর্ডারসমূহ:\n\n";
+
+//         orders.forEach((order, index) => {
+
+//             reply += `${index + 1}. ${order.orderStatus}\n`;
+//             reply += `🆔 ${order._id}\n`;
+//             reply += `💰 ${order.pricing.total}৳\n\n`;
+
+//         });
+
+//         return reply;
 
 
-}
+//     } catch (error) {
+
+//         console.log(
+//             "Phone Tracking Error:",
+//             error.response?.data || error.message
+//         );
+
+//         return null;
+//     }
+
+
+// }
 
 async function saveMessengerLog(
     senderId,
@@ -1154,206 +1154,206 @@ async function saveHumanSupportRequest(
 }
 
 
-app.post("/webhook", async (req, res) => {
-    // console.log(
-    //     "WEBHOOK RECEIVED:",
-    //     JSON.stringify(req.body, null, 2)
-    // );
-    try {
-        const body = req.body;
+// app.post("/webhook", async (req, res) => {
+//     // console.log(
+//     //     "WEBHOOK RECEIVED:",
+//     //     JSON.stringify(req.body, null, 2)
+//     // );
+//     try {
+//         const body = req.body;
 
-        if (body.object !== "page" && body.object !== "instagram") {
-            return res.sendStatus(404);
-        }
+//         if (body.object !== "page" && body.object !== "instagram") {
+//             return res.sendStatus(404);
+//         }
 
-        for (const entry of body.entry || []) {
-            for (const webhookEvent of entry.messaging || []) {
-                const senderId = webhookEvent.sender?.id;
+//         for (const entry of body.entry || []) {
+//             for (const webhookEvent of entry.messaging || []) {
+//                 const senderId = webhookEvent.sender?.id;
 
-                if (!senderId || !webhookEvent.message?.text) continue;
+//                 if (!senderId || !webhookEvent.message?.text) continue;
 
-                const userMessage =
-                    webhookEvent.message.text.trim();
+//                 const userMessage =
+//                     webhookEvent.message.text.trim();
 
-                await saveMessengerLog(
-                    senderId,
-                    userMessage
-                );
+//                 await saveMessengerLog(
+//                     senderId,
+//                     userMessage
+//                 );
 
-                const userState =
-                    await getUserState(senderId);
+//                 const userState =
+//                     await getUserState(senderId);
 
-                const orderIdRegex = /^[a-f0-9]{24}$/i;
-                const phoneRegex = /^(\+8801|01)[3-9]\d{8}$/;
+//                 const orderIdRegex = /^[a-f0-9]{24}$/i;
+//                 const phoneRegex = /^(\+8801|01)[3-9]\d{8}$/;
 
-                let replyText = null;
+//                 let replyText = null;
 
-                // =========================
-                // 1. PHONE TRACKING
-                // =========================
-                if (phoneRegex.test(userMessage)) {
-                    const trackingResponse = await getOrderTrackingByPhone(userMessage);
+//                 // =========================
+//                 // 1. PHONE TRACKING
+//                 // =========================
+//                 if (phoneRegex.test(userMessage)) {
+//                     const trackingResponse = await getOrderTrackingByPhone(userMessage);
 
-                    if (trackingResponse) {
-                        await axios.post(
-                            `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-                            {
-                                recipient: { id: senderId },
-                                message: { text: trackingResponse },
-                            }
-                        );
+//                     if (trackingResponse) {
+//                         await axios.post(
+//                             `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+//                             {
+//                                 recipient: { id: senderId },
+//                                 message: { text: trackingResponse },
+//                             }
+//                         );
 
-                        console.log("Phone Tracking Sent");
-                        continue; // skip rest
-                    }
-                }
+//                         console.log("Phone Tracking Sent");
+//                         continue; // skip rest
+//                     }
+//                 }
 
-                // =========================
-                // 2. ORDER ID TRACKING
-                // =========================
-                if (orderIdRegex.test(userMessage)) {
-                    const trackingResponse = await getOrderTracking(userMessage);
+//                 // =========================
+//                 // 2. ORDER ID TRACKING
+//                 // =========================
+//                 if (orderIdRegex.test(userMessage)) {
+//                     const trackingResponse = await getOrderTracking(userMessage);
 
-                    if (trackingResponse) {
-                        await axios.post(
-                            `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-                            {
-                                recipient: { id: senderId },
-                                message: { text: trackingResponse },
-                            }
-                        );
+//                     if (trackingResponse) {
+//                         await axios.post(
+//                             `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+//                             {
+//                                 recipient: { id: senderId },
+//                                 message: { text: trackingResponse },
+//                             }
+//                         );
 
-                        console.log("Order Status Sent");
-                        continue; // skip rest
-                    }
-                }
+//                         console.log("Order Status Sent");
+//                         continue; // skip rest
+//                     }
+//                 }
 
-                // =========================
-                // HUMAN SUPPORT
-                // =========================
-                if (
-                    userMessage.toLowerCase().includes("agent") ||
-                    userMessage.toLowerCase().includes("support") ||
-                    userMessage.toLowerCase().includes("admin") ||
-                    userMessage.toLowerCase().includes("human") ||
-                    userMessage.includes("মানুষ") ||
-                    userMessage.includes("সাপোর্ট")
-                ) {
+//                 // =========================
+//                 // HUMAN SUPPORT
+//                 // =========================
+//                 if (
+//                     userMessage.toLowerCase().includes("agent") ||
+//                     userMessage.toLowerCase().includes("support") ||
+//                     userMessage.toLowerCase().includes("admin") ||
+//                     userMessage.toLowerCase().includes("human") ||
+//                     userMessage.includes("মানুষ") ||
+//                     userMessage.includes("সাপোর্ট")
+//                 ) {
 
-                    await saveHumanSupportRequest(
-                        senderId,
-                        userMessage
-                    );
+//                     await saveHumanSupportRequest(
+//                         senderId,
+//                         userMessage
+//                     );
 
-                    replyText =
-                        "📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।";
-                }
+//                     replyText =
+//                         "📞 আমাদের সাপোর্ট টিম খুব দ্রুত আপনার সাথে যোগাযোগ করবে।";
+//                 }
 
-                // =========================
-                // 3. FAQ CHECK
-                // =========================
-                const faqResponse = getFAQResponse(userMessage);
+//                 // =========================
+//                 // 3. FAQ CHECK
+//                 // =========================
+//                 const faqResponse = getFAQResponse(userMessage);
 
-                if (faqResponse &&
-                    !replyText) {
+//                 if (faqResponse &&
+//                     !replyText) {
 
-                    if (
-                        userMessage.toLowerCase().includes("size") ||
-                        userMessage.toLowerCase().includes("সাইজ") ||
-                        userMessage.toLowerCase().includes("মাপ")
-                    ) {
-                        await setUserState(
-                            senderId,
-                            "waiting_for_size"
-                        );
-                    }
+//                     if (
+//                         userMessage.toLowerCase().includes("size") ||
+//                         userMessage.toLowerCase().includes("সাইজ") ||
+//                         userMessage.toLowerCase().includes("মাপ")
+//                     ) {
+//                         await setUserState(
+//                             senderId,
+//                             "waiting_for_size"
+//                         );
+//                     }
 
-                    replyText = faqResponse;
-                }
+//                     replyText = faqResponse;
+//                 }
 
-                // =========================
-                // 4. SIZE RECOMMENDATION
-                // =========================
-                if (
-                    !replyText &&
-                    userState === "waiting_for_size"
-                ) {
+//                 // =========================
+//                 // 4. SIZE RECOMMENDATION
+//                 // =========================
+//                 if (
+//                     !replyText &&
+//                     userState === "waiting_for_size"
+//                 ) {
 
-                    const sizeReply =
-                        getSizeRecommendation(userMessage);
+//                     const sizeReply =
+//                         getSizeRecommendation(userMessage);
 
-                    if (sizeReply) {
+//                     if (sizeReply) {
 
-                        replyText = sizeReply;
+//                         replyText = sizeReply;
 
-                        await setUserState(
-                            senderId,
-                            null
-                        );
-                    }
-                }
+//                         await setUserState(
+//                             senderId,
+//                             null
+//                         );
+//                     }
+//                 }
 
-                // =========================
-                // 5. PRODUCT RECOMMENDATION
-                // =========================
-                if (!replyText) {
-                    const productReply = await getProductRecommendation(userMessage);
-                    if (productReply) {
-                        console.log("Product Recommendation Found");
-                        replyText = productReply;
-                    }
-                }
+//                 // =========================
+//                 // 5. PRODUCT RECOMMENDATION
+//                 // =========================
+//                 if (!replyText) {
+//                     const productReply = await getProductRecommendation(userMessage);
+//                     if (productReply) {
+//                         console.log("Product Recommendation Found");
+//                         replyText = productReply;
+//                     }
+//                 }
 
-                // =========================
-                // 6. AI FALLBACK
-                // =========================
-                // if (!replyText) {
-                //     console.log("Using OpenAI");
-                //     replyText = await getAIResponse(userMessage);
-                // }
+//                 // =========================
+//                 // 6. AI FALLBACK
+//                 // =========================
+//                 // if (!replyText) {
+//                 //     console.log("Using OpenAI");
+//                 //     replyText = await getAIResponse(userMessage);
+//                 // }
 
-                // =========================
-                // SEND RESPONSE
-                // =========================
-                // if (replyText) {
-                //     await axios.post(
-                //         `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
-                //         {
-                //             recipient: { id: senderId },
-                //             message: { text: replyText },
-                //         }
-                //     );
+//                 // =========================
+//                 // SEND RESPONSE
+//                 // =========================
+//                 // if (replyText) {
+//                 //     await axios.post(
+//                 //         `https://graph.facebook.com/v23.0/me/messages?access_token=${process.env.PAGE_ACCESS_TOKEN}`,
+//                 //         {
+//                 //             recipient: { id: senderId },
+//                 //             message: { text: replyText },
+//                 //         }
+//                 //     );
 
-                //     console.log("Reply Sent Successfully");
-                // }
-            }
-        }
+//                 //     console.log("Reply Sent Successfully");
+//                 // }
+//             }
+//         }
 
-        return res.sendStatus(200);
-    } catch (error) {
-        console.error(
-            "Messenger Reply Error:",
-            error.response?.data || error.message
-        );
+//         return res.sendStatus(200);
+//     } catch (error) {
+//         console.error(
+//             "Messenger Reply Error:",
+//             error.response?.data || error.message
+//         );
 
-        return res.sendStatus(500);
-    }
-});
+//         return res.sendStatus(500);
+//     }
+// });
 
-app.get("/webhook", (req, res) => {
-    const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+// app.get("/webhook", (req, res) => {
+//     const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
-    const mode = req.query["hub.mode"];
-    const token = req.query["hub.verify_token"];
-    const challenge = req.query["hub.challenge"];
+//     const mode = req.query["hub.mode"];
+//     const token = req.query["hub.verify_token"];
+//     const challenge = req.query["hub.challenge"];
 
-    if (mode === "subscribe" && token === VERIFY_TOKEN) {
-        console.log("Webhook verified successfully!");
-        return res.status(200).send(challenge);
-    }
+//     if (mode === "subscribe" && token === VERIFY_TOKEN) {
+//         console.log("Webhook verified successfully!");
+//         return res.status(200).send(challenge);
+//     }
 
-    return res.sendStatus(403);
-});
+//     return res.sendStatus(403);
+// });
 
 
 // Export for Vercel
