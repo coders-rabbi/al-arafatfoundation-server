@@ -421,7 +421,7 @@ app.get("/orders/:id", async (req, res) => {
 
 
 // get single order by phone number
-app.get("/orders/phone/:phone", async (req, res) => {
+app.get("/order/phone/:phone", async (req, res) => {
     try {
 
         const phone = req.params.phone;
