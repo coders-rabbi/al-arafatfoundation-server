@@ -165,7 +165,6 @@ app.get("/writers", async (req, res) => {
 app.post("/product", async (req, res) => {
     try {
         const productData = req.body;
-        console.log("Inserting Product:", productData);
 
         const database = await connectDB();
 
