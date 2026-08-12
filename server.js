@@ -205,6 +205,47 @@ app.get("/products", async (req, res) => {
     }
 });
 
+
+// Search Products by ID (for autocomplete/suggestion)
+app.get("/products/search/:query", async (req, res) => {
+    try {
+        const searchQuery = req.params.query?.trim();
+
+        if (!searchQuery) {
+            return res.send([]);
+        }
+
+        const database = await connectDB();
+        const productsCollection = database.collection("products");
+
+        // regex special characters escape করা (security + bug fix)
+        const escaped = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        const result = await productsCollection
+            .find({
+                id: { $regex: escaped, $options: "i" }, // "SUM26" লিখলেও "SUM260001" ম্যাচ করবে
+            })
+            .project({
+                id: 1,
+                "basicInfo.productName": 1,
+                "media.thumbnailImage": 1,
+                "pricingInventory.price": 1,
+                "pricingInventory.discountPrice": 1,
+                "pricingInventory.stockKeepingUnit": 1,
+                "variation.size": 1,
+            })
+            .limit(8)
+            .toArray();
+
+        res.send(result);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "Internal Server Error",
+        });
+    }
+});
+
 // Single Product
 app.get("/products/:id", async (req, res) => {
     try {
@@ -507,6 +548,50 @@ app.get("/orders_data", async (req, res) => {
 
         res.status(500).send({
             message: "Internal Server Error",
+        });
+    }
+});
+
+
+
+// ================= COURIER TRACKING (Paperfly) =================
+app.get("/courier/track/:referenceNumber", async (req, res) => {
+    try {
+        const { referenceNumber } = req.params;
+
+        if (!referenceNumber) {
+            return res.status(400).send({
+                message: "Reference number is required",
+            });
+        }
+
+        const response = await axios.post(
+            "https://api.paperfly.com.bd/API-Order-Tracking",
+            {
+                ReferenceNumber: referenceNumber,
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    paperflykey: process.env.PAPERFLY_API_KEY,
+                },
+                auth: {
+                    username: process.env.PAPERFLY_USERNAME,
+                    password: process.env.PAPERFLY_PASSWORD,
+                },
+            }
+        );
+
+        res.send(response.data);
+    } catch (error) {
+        console.error(
+            "Paperfly Tracking Error:",
+            error.response?.data || error.message
+        );
+
+        res.status(error.response?.status || 500).send({
+            message: "Failed to track order",
+            error: error.response?.data || error.message,
         });
     }
 });
