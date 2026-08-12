@@ -633,8 +633,6 @@ app.get(
     }
 );
 
-
-// Update Order Status
 app.patch("/orders/:id/status", async (req, res) => {
     try {
         const orderID = req.params.id;
