@@ -1016,69 +1016,69 @@ async function getProductRecommendation(userMessage) {
     }
 }
 
-// async function getOrderTracking(orderId) {
-//     try {
+async function getOrderTracking(orderId) {
+    try {
 
-//         console.log("Tracking Order ID:", orderId);
+        console.log("Tracking Order ID:", orderId);
 
-//         const response = await axios.get(
-//             `https://al-arafatfoundation-server-production.up.railway.app/orders/${orderId}`
-//         );
+        const response = await axios.get(
+            `https://al-arafatfoundation-server-production.up.railway.app/orders/${orderId}`
+        );
 
-//         console.log("Order Response:", response.data);
+        console.log("Order Response:", response.data);
 
-//         const order = response.data;
+        const order = response.data;
 
-//         return `📦 Order Status: ${order.orderStatus}`;
+        return `📦 Order Status: ${order.orderStatus}`;
 
-//     } catch (error) {
+    } catch (error) {
 
-//         console.log(
-//             "Order Tracking Error:",
-//             error.response?.data || error.message
-//         );
+        console.log(
+            "Order Tracking Error:",
+            error.response?.data || error.message
+        );
 
-//         return null;
-//     }
-// }
-
-
-// async function getOrderTrackingByPhone(phone) {
-//     try {
+        return null;
+    }
+}
 
 
-//         const response = await axios.get(
-//             `https://al-arafatfoundation-server-production.up.railway.app/orders/phone/${phone}`
-//         );
-
-//         const orders = response.data;
-
-//         let reply =
-//             "📦 আপনার সাম্প্রতিক অর্ডারসমূহ:\n\n";
-
-//         orders.forEach((order, index) => {
-
-//             reply += `${index + 1}. ${order.orderStatus}\n`;
-//             reply += `🆔 ${order._id}\n`;
-//             reply += `💰 ${order.pricing.total}৳\n\n`;
-
-//         });
-
-//         return reply;
+async function getOrderTrackingByPhone(phone) {
+    try {
 
 
-//     } catch (error) {
+        const response = await axios.get(
+            `https://al-arafatfoundation-server-production.up.railway.app/orders/phone/${phone}`
+        );
 
-//         console.log(
-//             "Phone Tracking Error:",
-//             error.response?.data || error.message
-//         );
+        const orders = response.data;
 
-//         return null;
-//     }
+        let reply =
+            "📦 আপনার সাম্প্রতিক অর্ডারসমূহ:\n\n";
+
+        orders.forEach((order, index) => {
+
+            reply += `${index + 1}. ${order.orderStatus}\n`;
+            reply += `🆔 ${order._id}\n`;
+            reply += `💰 ${order.pricing.total}৳\n\n`;
+
+        });
+
+        return reply;
 
 
-// }
+    } catch (error) {
+
+        console.log(
+            "Phone Tracking Error:",
+            error.response?.data || error.message
+        );
+
+        return null;
+    }
+
+
+}
 
 async function saveMessengerLog(
     senderId,
@@ -1442,7 +1442,6 @@ async function saveHumanSupportRequest(
 module.exports = app;
 
 
-// Local Server
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
