@@ -20,6 +20,29 @@ const openai = new OpenAI({
 app.use(cors());
 app.use(express.json());
 
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+// Cloudinary কনফিগার
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Cloudinary কে storage engine হিসেবে ব্যবহার করা হচ্ছে
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "flame-products", // Cloudinary-তে এই নামে ফোল্ডার তৈরি হবে
+        allowed_formats: ["jpg", "jpeg", "png", "webp"],
+        transformation: [{ width: 1200, crop: "limit" }], // অপশনাল: বড় ইমেজ অটো রিসাইজ
+    },
+});
+
+const upload = multer({ storage });
+
 // MongoDB URI
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.bdtg0ka.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -162,30 +185,40 @@ app.get("/writers", async (req, res) => {
 
 // ================= PRODUCT ROUTES =================
 
-app.post("/product", async (req, res) => {
-    try {
-        const productData = req.body;
+app.post(
+    "/product",
+    upload.fields([
+        { name: "mainImage", maxCount: 1 },
+        { name: "thumbnailImage", maxCount: 1 },
+        { name: "galleryImages", maxCount: 10 },
+    ]),
+    async (req, res) => {
+        try {
+            const productData = JSON.parse(req.body.data);
+            const database = await connectDB();
+            const productsCollection = database.collection("products");
+            console.log(productData)
 
-        const database = await connectDB();
+            productData.media = {
+                mainImage: req.files["mainImage"]?.[0]?.path || "",
+                thumbnailImage: req.files["thumbnailImage"]?.[0]?.path || "",
+                galleryImages: (req.files["galleryImages"] || []).map(
+                    (file) => file.path,
+                ),
+            };
 
-        // কমেন্ট তুলে দেওয়া হলো যেন ডেটাবেজে ডেটা ইনসার্ট হয়
-        const productsCollection = database.collection("products");
-        const result = await productsCollection.insertOne(productData);
-
-        res.status(201).send({
-            message: "Product created successfully",
-            id: result.insertedId, // এখানে 'id' পাঠানো হলো যাতে ফ্রন্টএন্ডের 'data?.id' কন্ডিশন মেলে
-            product: productData,
-        });
-    } catch (error) {
-        console.error("Backend Error:", error);
-
-        res.status(500).send({
-            message: "Internal Server Error",
-        });
-    }
-});
-
+            const result = await productsCollection.insertOne(productData);
+            res.status(201).send({
+                message: "Product created successfully",
+                id: result.insertedId,
+                product: productData,
+            });
+        } catch (error) {
+            console.error("Backend Error:", error);
+            res.status(500).send({ message: "Internal Server Error" });
+        }
+    },
+);
 app.get("/products", async (req, res) => {
     try {
         const database = await connectDB();
@@ -205,7 +238,6 @@ app.get("/products", async (req, res) => {
 });
 
 
-// Search Products by ID (for autocomplete/suggestion)
 app.get("/products/search/:query", async (req, res) => {
     try {
         const searchQuery = req.params.query?.trim();
