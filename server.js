@@ -197,7 +197,6 @@ app.post(
             const productData = JSON.parse(req.body.data);
             const database = await connectDB();
             const productsCollection = database.collection("products");
-            console.log(productData)
 
             productData.media = {
                 mainImage: req.files["mainImage"]?.[0]?.path || "",
@@ -388,36 +387,77 @@ app.post("/orders", async (req, res) => {
 });
 
 
-app.post("/custom-order", async (req, res) => {
-    try {
-        const customOrder = req.body;
+app.post(
+    "/custom-order",
+    upload.fields([
+        { name: "frontImage", maxCount: 1 },
+        { name: "backImage", maxCount: 1 },
+        { name: "leftSleeveImage", maxCount: 1 },
+        { name: "rightSleeveImage", maxCount: 1 },
+    ]),
+    async (req, res) => {
+        try {
+            // multipart/form-data হওয়ায় বাকি ডেটা "data" ফিল্ডে JSON string আকারে আসবে
+            const customOrder = JSON.parse(req.body.data || "{}");
 
-        if (!customOrder || Object.keys(customOrder).length === 0) {
-            return res.status(400).send({
-                message: "Custom Order data is required",
+            if (!customOrder || Object.keys(customOrder).length === 0) {
+                return res.status(400).send({
+                    message: "Custom Order data is required",
+                });
+            }
+
+            const database = await connectDB();
+            const customOrderCollection = database.collection("custom-order");
+
+            const lastOrder = await customOrderCollection.findOne(
+                {},
+                { sort: { _id: -1 } }
+            );
+            const nextOrderId = getNextOrderId(
+                lastOrder?.orderId,
+                "FLAC",
+                260001
+            );
+
+            // Cloudinary থেকে ফেরত আসা secure URL গুলো customOrder এ বসানো হচ্ছে
+            customOrder.frontImage = req.files["frontImage"]?.[0]?.path || "";
+            customOrder.backImage = req.files["backImage"]?.[0]?.path || "";
+            customOrder.leftSleeveImage =
+                req.files["leftSleeveImage"]?.[0]?.path || "";
+            customOrder.rightSleeveImage =
+                req.files["rightSleeveImage"]?.[0]?.path || "";
+
+            const orderDocument = {
+                ...customOrder,
+                orderId: nextOrderId,
+                createdAt: new Date(),
+            };
+
+            const result = await customOrderCollection.insertOne(orderDocument);
+
+            res.status(201).send({
+                message: "Order created successfully",
+                insertedId: result.insertedId,
+                order: orderDocument,
+            });
+        } catch (error) {
+            console.log("Custom Order Error:", error);
+            res.status(500).send({
+                message: "Internal Server Error",
             });
         }
+    }
+);
 
+app.get("/custom-orders", async (req, res) => {
+    try {
         const database = await connectDB();
-        const customOrderCollection = database.collection("custom-order");
 
-        const lastOrder = await customOrderCollection.findOne({}, { sort: { _id: -1 } });
-        const nextOrderId = getNextOrderId(lastOrder?.orderId, "FLAC", 260001);
+        const productsCollection = database.collection("custom-order");
 
-        const orderDocument = {
-            ...customOrder,
-            orderId: nextOrderId,
-            createdAt: new Date(),
-        };
+        const result = await productsCollection.find().toArray();
 
-        const result = await customOrderCollection.insertOne(orderDocument);
-        // console.log(orderDocument)
-
-        res.status(201).send({
-            message: "Order created successfully",
-            insertedId: result.insertedId,
-            order: orderDocument,
-        });
+        res.send(result);
     } catch (error) {
         console.log(error);
 
@@ -425,7 +465,7 @@ app.post("/custom-order", async (req, res) => {
             message: "Internal Server Error",
         });
     }
-});
+})
 
 
 
