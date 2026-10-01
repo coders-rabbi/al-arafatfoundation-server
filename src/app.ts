@@ -15,8 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://www.genvoice.news",
-  "https://83575ff8-gen-voice.codersrabbi.workers.dev",
+  "https://alarafatfoundation.org",
 ];
 
 app.use(
