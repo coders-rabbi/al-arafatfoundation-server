@@ -1,0 +1,10 @@
+{
+  "name": "gen-voice-backend",
+  "main": "dist/server.js",
+  "compatibility_date": "2025-07-30",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "enable_nodejs_http_modules",
+    "enable_nodejs_http_server_modules"
+  ]
+}
