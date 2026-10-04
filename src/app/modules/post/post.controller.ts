@@ -25,8 +25,9 @@ const getAllPostsController = catchAsync(async (req, res) => {
 });
 
 const getSinglePostController = catchAsync(async (req, res) => {
-  
-  const result = await PostServices.getSinglePostFromDB(req.params.id as string);
+  const result = await PostServices.getSinglePostFromDB(
+    req.params.postId as string,
+  );
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
@@ -35,11 +36,10 @@ const getSinglePostController = catchAsync(async (req, res) => {
   });
 });
 
-
 const updatePostController = catchAsync(async (req, res) => {
   const result = await PostServices.updatePostInDB(
     req.params.id as string,
-    req.body
+    req.body,
   );
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -59,7 +59,6 @@ const deletePostController = catchAsync(async (req, res) => {
   });
 });
 
-    
 export const PostControllers = {
   createPostController,
   getAllPostsController,
