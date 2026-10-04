@@ -3,6 +3,7 @@ import { uploadhRoutes } from "../modules/upload/upload.route";
 import { PostRouter } from "../modules/post/post.route";
 import { BlogRouter } from "../modules/blog/blog.route";
 import { MediaRouter } from "../modules/media/media.route";
+import { DonationRouter } from "../modules/donation/donation.route.";
 
 const router = Router();
 
@@ -23,6 +24,10 @@ const modulesRoutes = [
     path: "/upload",
     route: uploadhRoutes,
   },
+  {
+    path: "/donations",
+    route: DonationRouter
+  }
 ];
 
 modulesRoutes.forEach((route) => router.use(route.path, route.route));
