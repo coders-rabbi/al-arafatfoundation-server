@@ -21,8 +21,28 @@ const createDonationIntoDB = async (payload: TDonation) => {
 };
 
 const getAllDonationsFromDB = async (status?: TDonationStatus) => {
-  const filter: { status?: TDonationStatus } = status ? { status } : {};
-  const result = await Donation.find(filter).sort({ createdAt: -1 });
+  const match = status ? { status } : {};
+
+  const result = await Donation.aggregate([
+    { $match: match },
+    {
+      $addFields: {
+        statusOrder: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$status", "pending"] }, then: 0 },
+              { case: { $eq: ["$status", "verified"] }, then: 1 },
+              { case: { $eq: ["$status", "rejected"] }, then: 2 },
+            ],
+            default: 3,
+          },
+        },
+      },
+    },
+    { $sort: { statusOrder: 1, createdAt: -1 } },
+    { $project: { statusOrder: 0 } },
+  ]);
+
   return result;
 };
 
