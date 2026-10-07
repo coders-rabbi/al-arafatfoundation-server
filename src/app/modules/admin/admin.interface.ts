@@ -1,4 +1,3 @@
-import { Model } from "mongoose";
 import { ADMIN_ROLE } from "./admin.constant";
 
 export type TAdminRole = (typeof ADMIN_ROLE)[keyof typeof ADMIN_ROLE];

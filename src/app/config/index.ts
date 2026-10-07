@@ -14,8 +14,8 @@ export default {
   client_url: process.env.CLIENT_URL,
   smpt_user: process.env.SMTP_USER,
   smpt_pass: process.env.SMTP_PASS,
-  resend_api_key: process.env.RESEND_API_KEY
-
+  resend_api_key: process.env.RESEND_API_KEY,
+  super_admin_pass: process.env.SUPER_ADMIN_PASS,
 };
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });

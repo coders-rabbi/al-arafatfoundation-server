@@ -1,25 +1,20 @@
-import http from "http";
+import mongoose from "mongoose";
 import { app } from "./app";
+import { seedSuperAdmin } from "./app/modules/DB";
 import config from "./app/config";
-import { initSocket } from "./app/socket";
 
-const server = http.createServer(app);
+async function main() {
+  await mongoose.connect(config.database_url as string);
+  console.log("MongoDB connected");
 
-initSocket(server);
+  await seedSuperAdmin();
 
-const PORT = config.port || 5000;
-server.listen(PORT, () => {
-  console.log(`Arafat Foundation app listening on port ${PORT}`);
-});
+  app.listen(config.port, () => {
+    console.log(`Server running on port ${config.port}`);
+  });
+}
 
-process.on("unhandledRejection", () => {
-  console.log("Unhandled rejection detected, shutting down...");
+main().catch((err) => {
+  console.error("Server failed to start:", err);
   process.exit(1);
 });
-
-process.on("uncaughtException", () => {
-  console.log("Uncaught exception detected, shutting down...");
-  process.exit(1);
-});
-
-export default app;
