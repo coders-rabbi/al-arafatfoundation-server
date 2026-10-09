@@ -23,8 +23,8 @@ router.patch(
   BlogControllers.updateBlogController,
 );
 
-router.delete(
-  "/:blogId",
+router.patch(
+  "/:blogId/delete",
   // authValidation(ADMIN_ROLE.SUPER_ADMIN, ADMIN_ROLE.ADMIN),
   BlogControllers.deleteBlogController,
 );

@@ -11,6 +11,10 @@ const createBlogValidationSchema = z.object({
       .array(z.url("Each image must be a valid URL"))
       .max(10, "Maximum 10 images allowed")
       .default([]),
+
+    isDeleted: z
+      .boolean("isDeleted must be a boolean (true or false)")
+      .default(false),
   }),
 });
 
@@ -24,6 +28,10 @@ const updateBlogValidationSchema = z.object({
       .array(z.url("Each image must be a valid URL"))
       .max(10, "Maximum 10 images allowed")
       .optional(),
+
+    isDeleted: z
+      .boolean("isDeleted must be a boolean (true or false)")
+      .default(false),
   }),
 });
 

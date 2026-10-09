@@ -38,7 +38,14 @@ const updateBlogInDB = async (blogId: string, payload: Partial<IBlog>) => {
 };
 
 const deleteBlogFromDB = async (blogId: string) => {
-  const result = await Blog.findByIdAndDelete(blogId);
+  const result = await Blog.findOneAndUpdate(
+    { _id: blogId, isDeleted: false },
+    { isDeleted: true },
+    {
+      returnDocument: "after",
+      runValidators: true,
+    },
+  );
 
   if (!result) {
     throw new AppError(StatusCodes.NOT_FOUND, "Blog not found");

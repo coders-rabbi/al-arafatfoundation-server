@@ -10,7 +10,7 @@ const router = Router();
 
 const modulesRoutes = [
   {
-    path: "/posts",
+    path: "/activities",
     route: PostRouter,
   },
   {

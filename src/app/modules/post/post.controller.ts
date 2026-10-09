@@ -4,7 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import catchAsync from "../../utils/catchAsync";
 import { PostServices } from "./post.service";
 
-const createPostController = catchAsync(async (req, res) => {
+const createActivitieController = catchAsync(async (req, res) => {
   const result = await PostServices.createPostIntroBD(req.body);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -14,7 +14,7 @@ const createPostController = catchAsync(async (req, res) => {
   });
 });
 
-const getAllPostsController = catchAsync(async (req, res) => {
+const getAllActivitieController = catchAsync(async (req, res) => {
   const result = await PostServices.getAllPostFromDB();
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -24,19 +24,19 @@ const getAllPostsController = catchAsync(async (req, res) => {
   });
 });
 
-const getSinglePostController = catchAsync(async (req, res) => {
+const getSingleActivitieController = catchAsync(async (req, res) => {
   const result = await PostServices.getSinglePostFromDB(
-    req.params.postId as string,
+    req.params.activitieId as string,
   );
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: "Post is successfully retrieved from the database",
+    message: "Activitie is successfully retrieved from the database",
     data: result,
   });
 });
 
-const updatePostController = catchAsync(async (req, res) => {
+const updateActivitieController = catchAsync(async (req, res) => {
   const result = await PostServices.updatePostInDB(
     req.params.id as string,
     req.body,
@@ -49,7 +49,7 @@ const updatePostController = catchAsync(async (req, res) => {
   });
 });
 
-const deletePostController = catchAsync(async (req, res) => {
+const deleteActivitieController = catchAsync(async (req, res) => {
   const result = await PostServices.deletePostFromDB(req.params.id as string);
   sendResponse(res, {
     statusCode: StatusCodes.OK,
@@ -59,10 +59,10 @@ const deletePostController = catchAsync(async (req, res) => {
   });
 });
 
-export const PostControllers = {
-  createPostController,
-  getAllPostsController,
-  getSinglePostController,
-  updatePostController,
-  deletePostController,
+export const ActivitieControllers = {
+  createActivitieController,
+  getAllActivitieController,
+  getSingleActivitieController,
+  updateActivitieController,
+  deleteActivitieController,
 };

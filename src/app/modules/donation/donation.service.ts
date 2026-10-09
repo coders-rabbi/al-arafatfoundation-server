@@ -53,7 +53,7 @@ const updateDonationStatusIntoDB = async (
   const result = await Donation.findByIdAndUpdate(
     id,
     { status },
-    { new: true, runValidators: true },
+    { returnDocument: "after", runValidators: true },
   );
 
   if (!result) {
