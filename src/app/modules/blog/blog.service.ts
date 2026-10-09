@@ -38,6 +38,7 @@ const updateBlogInDB = async (blogId: string, payload: Partial<IBlog>) => {
 };
 
 const deleteBlogFromDB = async (blogId: string) => {
+  console.log(blogId);
   const result = await Blog.findOneAndUpdate(
     { _id: blogId, isDeleted: false },
     { isDeleted: true },

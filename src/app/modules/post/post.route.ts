@@ -24,4 +24,6 @@ router.patch(
   ActivitieControllers.updateActivitieController,
 );
 
+router.patch("/:activitieId/delete", ActivitieControllers.deleteActivitieController);
+
 export const PostRouter = router;

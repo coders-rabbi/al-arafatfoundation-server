@@ -12,7 +12,6 @@ const getAllPostFromDB = async () => {
 };
 
 const getSinglePostFromDB = async (id: string) => {
-  console.log(id)
   const result = await Post.findById(id);
   return result;
 };

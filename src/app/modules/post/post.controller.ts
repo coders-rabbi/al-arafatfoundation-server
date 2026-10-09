@@ -50,7 +50,9 @@ const updateActivitieController = catchAsync(async (req, res) => {
 });
 
 const deleteActivitieController = catchAsync(async (req, res) => {
-  const result = await PostServices.deletePostFromDB(req.params.id as string);
+  const result = await PostServices.deletePostFromDB(
+    req.params.activitieId as string,
+  );
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
