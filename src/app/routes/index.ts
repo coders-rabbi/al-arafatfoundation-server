@@ -5,6 +5,7 @@ import { BlogRouter } from "../modules/blog/blog.route";
 import { MediaRouter } from "../modules/media/media.route";
 import { DonationRouter } from "../modules/donation/donation.route.";
 import { adminRouters } from "../modules/admin/admin.route";
+import { ProjectRouter } from "../modules/project/project.route";
 
 const router = Router();
 
@@ -32,6 +33,10 @@ const modulesRoutes = [
   {
     path: "/admin",
     route: adminRouters,
+  },
+  {
+    path: "/projects",
+    route: ProjectRouter,
   },
 ];
 
