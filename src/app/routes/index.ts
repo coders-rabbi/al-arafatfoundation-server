@@ -6,6 +6,7 @@ import { MediaRouter } from "../modules/media/media.route";
 import { DonationRouter } from "../modules/donation/donation.route.";
 import { adminRouters } from "../modules/admin/admin.route";
 import { ProjectRouter } from "../modules/project/project.route";
+import { authRouters } from "../modules/auth/auth.route";
 
 const router = Router();
 
@@ -37,6 +38,10 @@ const modulesRoutes = [
   {
     path: "/projects",
     route: ProjectRouter,
+  },
+  {
+    path: "/auth",
+    route: authRouters,
   },
 ];
 

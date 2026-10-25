@@ -23,7 +23,7 @@ export const seedSuperAdmin = async () => {
       adminName: "Arafat Foundation",
       email: "info.alarafatfoundation@gmail.com",
       profileImage: "",
-      password: superAdminPass, // এখন টাইপ string
+      password: superAdminPass,
       role: ADMIN_ROLE.SUPER_ADMIN,
       isDeleted: false,
     });
