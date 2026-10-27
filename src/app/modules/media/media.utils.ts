@@ -4,7 +4,7 @@ export const getYouTubeId = (url: string): string | null => {
     .match(
       /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/,
     );
-  return match ? match[1] : null;
+  return match?.[1] ?? null;
 };
 
 export const getYouTubeThumbnail = (id: string) =>
