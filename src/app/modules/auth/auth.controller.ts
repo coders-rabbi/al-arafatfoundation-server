@@ -32,6 +32,27 @@ const loginController = catchAsync(async (req, res) => {
   });
 });
 
+
+const logoutController = catchAsync(async (req, res) => {
+  const options = {
+    httpOnly: true,
+    secure: config.node_env === "production",
+    sameSite: "lax" as const,
+    path: "/",
+  };
+
+  res.clearCookie("accessToken", options);
+  res.clearCookie("refreshToken", options);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: "Logout successful",
+    data: null,
+  });
+});
+
 export const authController = {
   loginController,
+  logoutController,
 };
