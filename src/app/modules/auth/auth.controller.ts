@@ -11,7 +11,7 @@ const loginController = catchAsync(async (req, res) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // dev e false
+    secure: config.node_env === "production", // dev e false
     sameSite: "lax",
     maxAge: 24 * 60 * 60 * 1000,
     path: "/",
