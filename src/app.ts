@@ -7,6 +7,9 @@ import cookieParser from "cookie-parser";
 
 export const app: Application = express();
 
+// Render proxy er pichone thake, tai secure cookie er jonno must
+app.set("trust proxy", 1);
+
 // parser
 app.use(express.json());
 app.use(cookieParser());
@@ -14,6 +17,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:3000",
   "https://alarafatfoundation.org",
+  "https://www.alarafatfoundation.org",
 ];
 
 app.use(
